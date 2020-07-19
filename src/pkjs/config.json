@@ -1,0 +1,112 @@
+[
+  {
+    "type": "heading",
+    "defaultValue": "Style configuration"
+  },
+  {
+    "type": "section",
+    "items": [
+      {
+        "type": "heading",
+        "defaultValue": "Date and time"
+      },
+      {
+        "type": "color",
+        "messageKey": "S_BG_COLOUR",
+        "defaultValue": "FFFFFF",
+        "label": "Background"
+      },
+      {
+        "type": "color",
+        "messageKey": "S_TIME_COLOUR",
+        "defaultValue": "000000",
+        "label": "Time text"
+      },
+      {
+        "type": "color",
+        "messageKey": "S_DATE_COLOUR",
+        "defaultValue": "000055",
+        "label": "Date text"
+      },
+      {
+        "type": "color",
+        "messageKey": "S_HOUR_HAND_COLOUR",
+        "defaultValue": "AA0000",
+        "label": "Hour hand"
+      },
+      {
+        "type": "color",
+        "messageKey": "S_MINUTE_HAND_COLOUR",
+        "defaultValue": "0055FF",
+        "label": "Minute hand"
+      }
+    ]
+  },
+  {
+    "type": "section",
+    "items": [
+      {
+        "type": "heading",
+        "defaultValue": "Hour indicator marks"
+      },
+      {
+        "type": "color",
+        "messageKey": "S_TICKS_COLOUR",
+        "defaultValue": "000055",
+        "label": "Colour"
+      },
+      {
+        "type": "slider",
+        "messageKey": "S_TICKS_SIZE",
+        "defaultValue": 2,
+        "label": "Size",
+        "min": 0,
+        "max": 5
+      },
+      {
+        "type": "toggle",
+        "messageKey": "S_BATTERY_GAUGE_ENABLED",
+        "label": "Battery indicator",
+        "description": "Show battery usage with hollow indicator marks",
+        "defaultValue": true
+      }
+    ]
+  },
+  {
+    "type": "section",
+    "items": [
+      {
+        "type": "heading",
+        "defaultValue": "Thermometer"
+      },
+      {
+        "type": "toggle",
+        "messageKey": "S_TEMP_ENABLED",
+        "label": "Show temperature",
+        "defaultValue": true
+      },
+      {
+        "type": "color",
+        "messageKey": "S_TEMP_NOW_COLOUR",
+        "defaultValue": "AA0000",
+        "label": "Current"
+      },
+      {
+        "type": "color",
+        "messageKey": "S_TEMP_RANGE_COLOUR",
+        "defaultValue": "FFAAAA",
+        "label": "Today’s range"
+      },
+      {
+        "type": "input",
+        "messageKey": "S_API_KEY",
+        "label": "Dark Sky API key"
+      }
+    ]
+  },
+  {
+    "type": "submit",
+  	"id": "save-button",
+    "defaultValue": "Save"
+  }
+]
