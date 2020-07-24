@@ -5,9 +5,9 @@
 #include "enamel.h"
 #include <pebble-events/pebble-events.h>
 
-static Window *s_main_window;
+static Window *main_window;
 
-static EventHandle s_settings_updated_handle;
+static EventHandle settings_updated_handle;
 
 
 static unsigned short get_display_hour(unsigned short hour) {
@@ -28,12 +28,12 @@ static void display_time(struct tm *tick_time) {
 }
 
 static void display_date(struct tm *tick_time) {
-	static char s_day_buffer[8], s_date_buffer[8];
-	strftime(s_day_buffer, sizeof("ddd"), "%a", tick_time);
-	update_day_of_week(s_day_buffer);
+	static char day_buffer[8], date_buffer[8];
+	strftime(day_buffer, sizeof("ddd"), "%a", tick_time);
+	update_day_of_week(day_buffer);
 
-	strftime(s_date_buffer, sizeof("dd mmm"), "%e %b", tick_time);
-	char *date_trimmed = s_date_buffer;
+	strftime(date_buffer, sizeof("dd mmm"), "%e %b", tick_time);
+	char *date_trimmed = date_buffer;
 	if (date_trimmed[0] == ' ') date_trimmed++;
 	update_date_month(date_trimmed);
 	// TODO try half width space
@@ -88,7 +88,7 @@ static void main_window_load(Window *window) {
 }
 
 static void main_window_unload(Window *window) {
-	enamel_settings_received_unsubscribe(s_settings_updated_handle);
+	enamel_settings_received_unsubscribe(settings_updated_handle);
 	destroy_layers();
 }
 
@@ -96,12 +96,12 @@ static void init() {
 	// Initialize Enamel to register App Message handlers and restores settings
 	enamel_init();
 
-	s_main_window = window_create();
-	window_set_window_handlers(s_main_window, (WindowHandlers) {
+	main_window = window_create();
+	window_set_window_handlers(main_window, (WindowHandlers) {
 		.load = main_window_load,
 		.unload = main_window_unload,
 	});
-	window_stack_push(s_main_window, true);
+	window_stack_push(main_window, true);
 
 	events_app_message_register_inbox_received(handle_weather_update, NULL);
 	const int inbox_size = 128;
@@ -115,7 +115,7 @@ static void init() {
 static void deinit() {
 	tick_timer_service_unsubscribe();
 	battery_state_service_unsubscribe();
-	window_destroy(s_main_window);
+	window_destroy(main_window);
 
 	// Deinit Enamel to unregister App Message handlers and save settings
 	enamel_deinit();
