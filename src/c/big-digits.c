@@ -72,7 +72,7 @@ static void load_digit_image_into_slot(int slot_number, int digit_value) {
 	layer_insert_below_sibling(bitmap_layer_get_layer(*layer), sibling_layer);
 }
 
-static void display_value(unsigned short value, unsigned short row_number, bool show_first_leading_zero) {
+static void display_value(unsigned short value, unsigned short row_number) {
 	value = value % 100; // Maximum of two digits per row.
 
 	// Column order is: | Column 0 | Column 1 |
@@ -80,7 +80,8 @@ static void display_value(unsigned short value, unsigned short row_number, bool 
 	// extracting the digits from the value easier.)
 	for (int column_number = 1; column_number >= 0; column_number--) {
 		int slot_number = (row_number * 2) + column_number;
-		if (!((value == 0) && (column_number == 0) && !show_first_leading_zero)) {
+		// load digit into slot, unless it is leading 0 of hour
+		if (!(value == 0 && column_number == 0 && row_number == 0)) {
 			load_digit_image_into_slot(slot_number, value % 10);
 		} else {
 			unload_digit_image_from_slot(slot_number);
@@ -94,11 +95,11 @@ void init_digits(Layer *layer) {
 }
 
 void set_digits_hour(unsigned short value) {
-	display_value(value, 0, false);
+	display_value(value, 0);
 }
 
 void set_digits_minute(unsigned short value) {
-	display_value(value, 1, true);
+	display_value(value, 1);
 }
 
 void set_digits_colour(GColor colour) {
