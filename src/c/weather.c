@@ -6,6 +6,10 @@ uint32_t persist_temp_now = 1;
 uint32_t persist_temp_min = 2;
 uint32_t persist_temp_max = 3;
 
+static int temp_min, temp_max, temp_now;
+static bool temp_range_defined = false;
+static bool temp_now_defined = false;
+
 static GColor temp_range_colour;
 static GColor temp_now_colour;
 
@@ -17,9 +21,7 @@ static int minute_to_rad(int minute) {
 }
 
 static void temp_now_update_proc(Layer *layer, GContext *ctx) {
-	if (persist_exists(persist_temp_now)) {
-		int temp_now = persist_read_int(persist_temp_now);
-
+	if (temp_now_defined) {
 		GRect bounds = layer_get_bounds(layer);
 		int temp_angle = minute_to_rad(temp_now);
 
@@ -36,10 +38,7 @@ static void temp_now_update_proc(Layer *layer, GContext *ctx) {
 }
 
 static void temp_range_update_proc(Layer *layer, GContext *ctx) {
-	if (persist_exists(persist_temp_min) && persist_exists(persist_temp_max)) {
-		int temp_min = persist_read_int(persist_temp_min);
-		int temp_max = persist_read_int(persist_temp_max);
-
+	if (temp_range_defined) {
 		GRect bounds = layer_get_bounds(layer);
 		graphics_context_set_fill_color(ctx, temp_range_colour);
 		graphics_fill_radial(ctx, bounds, GOvalScaleModeFitCircle, TEMP_RANGE_WIDTH, minute_to_rad(temp_min), minute_to_rad(temp_max));
@@ -51,6 +50,16 @@ void init_weather(Layer *range_layer, Layer *now_layer) {
 	temp_now_layer = now_layer;
 	layer_set_update_proc(temp_range_layer, temp_range_update_proc);
 	layer_set_update_proc(temp_now_layer, temp_now_update_proc);
+
+	if (persist_exists(persist_temp_min) && persist_exists(persist_temp_max)) {
+		temp_min = persist_read_int(persist_temp_min);
+		temp_max = persist_read_int(persist_temp_max);
+		layer_mark_dirty(temp_range_layer);
+	}
+	if (persist_exists(persist_temp_now)) {
+		temp_now = persist_read_int(persist_temp_now);
+		layer_mark_dirty(temp_now_layer);
+	}
 }
 
 void set_temp_range_colour(GColor colour) {
@@ -61,6 +70,19 @@ void set_temp_now_colour(GColor colour) {
 	temp_now_colour = colour;
 }
 
+void update_temp_range(int min, int max) {
+	temp_min = min;
+	temp_max = max;
+	temp_range_defined = true;
+	layer_mark_dirty(temp_range_layer);
+}
+
+void update_temp_now(int now) {
+	temp_now = now;
+	temp_now_defined = true;
+	layer_mark_dirty(temp_now_layer);
+}
+
 void handle_weather_update(DictionaryIterator *iterator, void *context) {
 	// Read tuples for data
 	Tuple *temp_now_tuple = dict_find(iterator, MESSAGE_KEY_TEMP_NOW);
@@ -69,8 +91,9 @@ void handle_weather_update(DictionaryIterator *iterator, void *context) {
 
 	// If temp range is available
 	if(temp_min_tuple && temp_max_tuple) {
-		int temp_min = (int)temp_min_tuple->value->int32;
-		int temp_max = (int)temp_max_tuple->value->int32;
+		temp_min = (int)temp_min_tuple->value->int32;
+		temp_max = (int)temp_max_tuple->value->int32;
+		temp_range_defined = true;
 
 		persist_write_int(persist_temp_min, temp_min);
 		persist_write_int(persist_temp_max, temp_max);
@@ -79,7 +102,9 @@ void handle_weather_update(DictionaryIterator *iterator, void *context) {
 	}
 
 	if(temp_now_tuple) {
-		int temp_now = (int)temp_now_tuple->value->int32;
+		temp_now = (int)temp_now_tuple->value->int32;
+		temp_now_defined = true;
+
 		persist_write_int(persist_temp_now, temp_now);
 		layer_mark_dirty(temp_now_layer);
 	}
