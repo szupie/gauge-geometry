@@ -9,6 +9,8 @@ static Window *main_window;
 
 static EventHandle settings_updated_handle;
 
+// #define DEBUGGING_TIME
+
 
 static unsigned short get_display_hour(unsigned short hour) {
 	if (clock_is_24h_style()) {
@@ -74,6 +76,30 @@ static void handle_settings_received(void *context) {
 	refresh_date_time();
 }
 
+#ifdef DEBUGGING_TIME
+static time_t debug_now;
+static struct tm *debug_time;
+static void debug_cycle_dates() {
+	debug_time->tm_mday = debug_time->tm_mday%31+1;
+	debug_time->tm_mon = debug_time->tm_sec%12+1;
+
+	static char date_buffer[8];
+	strftime(date_buffer, sizeof("dd mmm"), "%e %b", debug_time);
+	char *date_trimmed = date_buffer;
+	if (date_trimmed[0] == ' ') date_trimmed++;
+	update_date_month(date_trimmed);
+}
+
+static void handle_test(struct tm *tick_time, TimeUnits units_changed) {
+	update_time((tick_time->tm_sec+17)%24, tick_time->tm_sec%60);
+	update_date_month("30 May");
+	update_temp_range(20, 25);
+	update_temp_now(22);
+	debug_cycle_dates();
+}
+#endif
+
+
 static void main_window_load(Window *window) {
 	load_window(window);
 
@@ -84,7 +110,14 @@ static void main_window_load(Window *window) {
 
 	refresh_date_time();
 
-	s_settings_updated_handle = enamel_settings_received_subscribe(handle_settings_received, NULL);
+	settings_updated_handle = enamel_settings_received_subscribe(handle_settings_received, NULL);
+
+	// DEBUGGING
+	#ifdef DEBUGGING_TIME
+	debug_now = time(NULL);
+	debug_time = localtime(&debug_now);
+	tick_timer_service_subscribe(SECOND_UNIT, handle_test);
+	#endif
 }
 
 static void main_window_unload(Window *window) {
