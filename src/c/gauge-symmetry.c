@@ -38,8 +38,6 @@ static void display_date(struct tm *tick_time) {
 	char *date_trimmed = date_buffer;
 	if (date_trimmed[0] == ' ') date_trimmed++;
 	update_date_month(date_trimmed);
-	// TODO try half width space
-
 }
 
 static void handle_minute_tick(struct tm *tick_time, TimeUnits units_changed) {

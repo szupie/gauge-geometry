@@ -16,6 +16,7 @@ var xhrRequest = function (url, type, callback) {
 };
 
 function locationSuccess(pos) {
+  console.log('Retrieving weather')
   if (weatherAPIKey) {
     // Construct URL
     var url = `https://api.darksky.net/forecast/${weatherAPIKey}/${pos.coords.latitude},${pos.coords.longitude}?units=si`;
@@ -72,8 +73,8 @@ function getWeather() {
 Pebble.addEventListener('webviewclosed', function(e) {
   clay.getSettings(e.response);
   const claySettings = clay.getSettings(e.response, false);
-  weatherAPIKey = claySettings['S_API_KEY'].value;
-  tempEnabled = claySettings['S_TEMP_ENABLED'].value;
+  weatherAPIKey = claySettings['WEATHER_API_KEY'].value;
+  tempEnabled = claySettings['TEMP_ENABLED'].value;
   getWeather();
 });
 
@@ -84,8 +85,8 @@ Pebble.addEventListener('ready',
 
     if (localStorage.getItem('clay-settings') !== null) {
       const claySettings = JSON.parse(localStorage.getItem('clay-settings'));
-      weatherAPIKey = claySettings['S_API_KEY'];
-      tempEnabled = claySettings['S_TEMP_ENABLED'];
+      weatherAPIKey = claySettings['WEATHER_API_KEY'];
+      tempEnabled = claySettings['TEMP_ENABLED'];
     }
   }
 );

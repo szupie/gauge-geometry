@@ -50,7 +50,7 @@ static void ticks_update_proc(Layer *layer, GContext *ctx) {
 	}
 }
 
-static void set_text_style(TextLayer *layer) {
+static void init_text_style(TextLayer *layer) {
 	GFont custom_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_POPPINS_16));
 	text_layer_set_background_color(layer, GColorClear);
 	text_layer_set_font(layer, custom_font);
@@ -79,6 +79,7 @@ void load_window(Window *window) {
 	window_layer = window_get_root_layer(window);
 	GRect bounds = layer_get_bounds(window_layer);
 
+	// create day of week and date text layers
 	int line_height = 16;
 	int bottom = bounds.size.h / 2 - 3;
 	int width = 60;
@@ -92,14 +93,19 @@ void load_window(Window *window) {
 	date_shadow_text_layer_a = text_layer_create(GRect(TEXT_SHADOW_OFFSET, line_height + TEXT_SHADOW_OFFSET, width, line_height*1.5));
 	date_shadow_text_layer_b = text_layer_create(GRect(TEXT_SHADOW_OFFSET, line_height - TEXT_SHADOW_OFFSET, width, line_height*1.5));
 
-	set_text_style(day_text_layer);
-	set_text_style(day_shadow_text_layer);
+	init_text_style(day_text_layer);
+	init_text_style(day_shadow_text_layer);
+	init_text_style(date_text_layer);
+	init_text_style(date_shadow_text_layer_a);
+	init_text_style(date_shadow_text_layer_b);
 
-	set_text_style(date_text_layer);
-	set_text_style(date_shadow_text_layer_a);
-	set_text_style(date_shadow_text_layer_b);
+	layer_add_child(date_group_layer, text_layer_get_layer(day_shadow_text_layer));
+	layer_add_child(date_group_layer, text_layer_get_layer(date_shadow_text_layer_a));
+	layer_add_child(date_group_layer, text_layer_get_layer(date_shadow_text_layer_b));
+	layer_add_child(date_group_layer, text_layer_get_layer(day_text_layer));
+	layer_add_child(date_group_layer, text_layer_get_layer(date_text_layer));
 
-	// temperature
+	// create temperature gauge
 	temp_range_layer = layer_create(bounds);
 	temp_now_layer = layer_create(bounds);
 	init_weather(temp_range_layer, temp_now_layer);
@@ -108,39 +114,37 @@ void load_window(Window *window) {
 	ticks_canvas = layer_create(bounds);
 	layer_set_update_proc(ticks_canvas, ticks_update_proc);
 
+	// create big digits
 	init_digits(ticks_canvas);
 
+	// create hands
 	hands_layer = layer_create(bounds);
 	init_hands(bounds, hands_layer);
 
+	// add layers, foreground last
 	layer_add_child(window_layer, temp_range_layer);
 	layer_add_child(window_layer, ticks_canvas);
 	layer_add_child(window_layer, temp_now_layer);
 	layer_add_child(window_layer, hands_layer);
 	layer_add_child(window_layer, date_group_layer);
 
-	layer_add_child(date_group_layer, text_layer_get_layer(day_shadow_text_layer));
-	layer_add_child(date_group_layer, text_layer_get_layer(date_shadow_text_layer_a));
-	layer_add_child(date_group_layer, text_layer_get_layer(date_shadow_text_layer_b));
-	layer_add_child(date_group_layer, text_layer_get_layer(day_text_layer));
-	layer_add_child(date_group_layer, text_layer_get_layer(date_text_layer));
-
-	update_style(NULL);
+	// set style from settings
+	update_style();
 }
 
 void update_style() {
-	bg_colour = enamel_get_S_BG_COLOUR();
-	set_digits_colour(enamel_get_S_TIME_COLOUR());
-	date_colour = enamel_get_S_DATE_COLOUR();
-	set_hour_hand_colour(enamel_get_S_HOUR_HAND_COLOUR());
-	set_minute_hand_colour(enamel_get_S_MINUTE_HAND_COLOUR());
-	ticks_colour = enamel_get_S_TICKS_COLOUR();
-	ticks_size = enamel_get_S_TICKS_SIZE();
+	bg_colour = enamel_get_BG_COLOUR();
+	set_digits_colour(enamel_get_TIME_COLOUR());
+	date_colour = enamel_get_DATE_COLOUR();
+	set_hour_hand_colour(enamel_get_HOUR_HAND_COLOUR());
+	set_minute_hand_colour(enamel_get_MINUTE_HAND_COLOUR());
+	ticks_colour = enamel_get_TICKS_COLOUR();
+	ticks_size = enamel_get_TICKS_SIZE();
 
-	battery_gauge_enabled = enamel_get_S_BATTERY_GAUGE_ENABLED();
-	temp_enabled = enamel_get_S_TEMP_ENABLED();
-	set_temp_range_colour(enamel_get_S_TEMP_RANGE_COLOUR());
-	set_temp_now_colour(enamel_get_S_TEMP_NOW_COLOUR());
+	battery_gauge_enabled = enamel_get_BATTERY_GAUGE_ENABLED();
+	temp_enabled = enamel_get_TEMP_ENABLED();
+	set_temp_range_colour(enamel_get_TEMP_RANGE_COLOUR());
+	set_temp_now_colour(enamel_get_TEMP_NOW_COLOUR());
 
 	layer_set_hidden(temp_range_layer, !temp_enabled);
 	layer_set_hidden(temp_now_layer, !temp_enabled);
