@@ -52,13 +52,15 @@ void init_weather(Layer *range_layer, Layer *now_layer) {
 	layer_set_update_proc(temp_now_layer, temp_now_update_proc);
 
 	if (persist_exists(persist_temp_min) && persist_exists(persist_temp_max)) {
-		temp_min = persist_read_int(persist_temp_min);
-		temp_max = persist_read_int(persist_temp_max);
-		layer_mark_dirty(temp_range_layer);
+		update_temp_range(
+			persist_read_int(persist_temp_min),
+			persist_read_int(persist_temp_max)
+		);
 	}
 	if (persist_exists(persist_temp_now)) {
-		temp_now = persist_read_int(persist_temp_now);
-		layer_mark_dirty(temp_now_layer);
+		update_temp_now(
+			persist_read_int(persist_temp_now)
+		);
 	}
 }
 
