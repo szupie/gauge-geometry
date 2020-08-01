@@ -94,7 +94,7 @@
       {
         "type": "color",
         "messageKey": "TEMP_RANGE_COLOUR",
-        "defaultValue": "FF55FF",
+        "defaultValue": "FF55AA",
         "label": "Today’s range"
       },
       {
