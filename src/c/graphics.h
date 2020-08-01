@@ -15,5 +15,4 @@ void update_day_of_week(char *day);
 void update_date_month(char *date);
 void handle_battery_update(BatteryChargeState charge_state);
 GColor get_bg_colour();
-GRect get_window_bounds();
 void destroy_layers();

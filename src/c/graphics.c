@@ -8,7 +8,7 @@
 static Layer* window_layer;
 
 static TextLayer *day_text_layer, *date_text_layer, *day_shadow_text_layer, *date_shadow_text_layer_a, *date_shadow_text_layer_b;
-static Layer *date_group_layer, *ticks_canvas, *hands_layer, *temp_range_layer, *temp_now_layer;
+static Layer *date_group_layer, *digits_layer, *ticks_canvas, *hands_layer, *temp_range_layer, *temp_now_layer;
 
 static BatteryChargeState battery_state;
 
@@ -115,14 +115,16 @@ void load_window(Window *window) {
 	layer_set_update_proc(ticks_canvas, ticks_update_proc);
 
 	// create big digits
-	init_digits(ticks_canvas);
+	digits_layer = layer_create(bounds);
+	init_digits(digits_layer);
 
 	// create hands
 	hands_layer = layer_create(bounds);
-	init_hands(bounds, hands_layer);
+	init_hands(hands_layer);
 
 	// add layers, foreground last
 	layer_add_child(window_layer, temp_range_layer);
+	layer_add_child(window_layer, digits_layer);
 	layer_add_child(window_layer, ticks_canvas);
 	layer_add_child(window_layer, temp_now_layer);
 	layer_add_child(window_layer, hands_layer);
@@ -130,6 +132,7 @@ void load_window(Window *window) {
 
 	// set style from settings
 	update_style();
+
 }
 
 void update_style() {
@@ -164,8 +167,7 @@ void update_style() {
 }
 
 void update_time(unsigned short hour, unsigned short minute) {
-	set_digits_hour(hour);
-	set_digits_minute(minute);
+	set_digits(hour, minute);
 
 	update_date_group_position(hour);
 
@@ -192,22 +194,20 @@ GColor get_bg_colour() {
 	return bg_colour;
 }
 
-GRect get_window_bounds() {
-	return layer_get_bounds(window_layer);
-}
-
-
 void destroy_layers() {
-	destroy_digits_layers();
+	destroy_digits();
+	destroy_hands();
 
-	// Destroy TextLayer
 	text_layer_destroy(day_text_layer);
 	text_layer_destroy(day_shadow_text_layer);
 	text_layer_destroy(date_text_layer);
 	text_layer_destroy(date_shadow_text_layer_a);
 	text_layer_destroy(date_shadow_text_layer_b);
 
+	layer_destroy(digits_layer);
 	layer_destroy(ticks_canvas);
 	layer_destroy(hands_layer);
-	destroy_hands();
+	layer_destroy(date_group_layer);
+	layer_destroy(temp_range_layer);
+	layer_destroy(temp_now_layer);
 }
