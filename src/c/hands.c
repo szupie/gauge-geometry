@@ -32,6 +32,14 @@ static GPath *minute_hand_path, *hour_hand_path;
 static GColor hour_hand_colour;
 static GColor minute_hand_colour;
 
+static int32_t calc_hour_angle(unsigned short hour, unsigned short minute) {
+	return TRIG_MAX_ANGLE * ((hour % 12) + (minute / 60.0)) / 12.0;
+}
+
+static int32_t calc_minute_angle(unsigned short hour, unsigned short minute) {
+	return TRIG_MAX_ANGLE * minute / 60.0;
+}
+
 static void hands_update_proc(Layer *layer, GContext *ctx) {
 	graphics_context_set_fill_color(ctx, minute_hand_colour);
 	graphics_context_set_stroke_color(ctx, get_bg_colour());
@@ -50,9 +58,18 @@ static void animation_teardown(Animation *animation) {
 
 static void animation_update(Animation *animation, const AnimationProgress progress) {
 	int32_t total = ANIMATION_NORMALIZED_MAX - ANIMATION_NORMALIZED_MIN;
+	int32_t hour_angle_start = calc_hour_angle(10,8);
+	int32_t minute_angle_start = calc_minute_angle(10,8);
 
-	int32_t hour_angle = hour_angle_target * progress/total;
-	int32_t minute_angle = minute_angle_target * progress/total;
+	int32_t hour_diff = hour_angle_target-hour_angle_start;
+	int32_t minute_diff = minute_angle_target-minute_angle_start;
+
+	// always clockwise: if difference is negative, go the long way around
+	if (hour_diff < 0) { hour_diff += TRIG_MAX_ANGLE; }
+	if (minute_diff < 0) { minute_diff += TRIG_MAX_ANGLE; }
+
+	int32_t hour_angle = hour_diff*progress/total + hour_angle_start;
+	int32_t minute_angle = minute_diff*progress/total + minute_angle_start;
 
 	gpath_rotate_to(hour_hand_path, hour_angle);
 	gpath_rotate_to(minute_hand_path, minute_angle);
@@ -66,7 +83,7 @@ static void start_animation() {
 		animation_destroy(animation);
 	}
 	animation = animation_create();
-	animation_set_duration(animation, 300);
+	animation_set_duration(animation, 400);
 	animation_set_delay(animation, 0);
 	animation_set_curve(animation, AnimationCurveEaseInOut);
 	animation_implementation = (AnimationImplementation) {
@@ -98,8 +115,9 @@ void set_minute_hand_colour(GColor colour) {
 }
 
 void set_hands(unsigned short hour, unsigned short minute) {
-	hour_angle_target = TRIG_MAX_ANGLE * ((hour % 12) + (minute / 60)) / 12;
-	minute_angle_target = TRIG_MAX_ANGLE * minute / 60;
+	hour_angle_target = calc_hour_angle(hour, minute);
+	minute_angle_target = calc_minute_angle(hour, minute);
+	// APP_LOG(APP_LOG_LEVEL_DEBUG, "setting hands %d, %d", hour, minute);
 
 	if (init_animated) {
 		gpath_rotate_to(hour_hand_path, hour_angle_target);
