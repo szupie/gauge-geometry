@@ -76,7 +76,7 @@ Pebble.addEventListener('webviewclosed', function(e) {
 	const claySettings = clay.getSettings(e.response, false);
 	weatherAPIKey = claySettings['WEATHER_API_KEY'].value;
 	tempEnabled = claySettings['TEMP_ENABLED'].value;
-	getWeather();
+	// getWeather();
 });
 
 // Listen for when the watchface is opened

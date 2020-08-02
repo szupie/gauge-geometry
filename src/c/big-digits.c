@@ -26,7 +26,7 @@ static Animation *anims[TOTAL_TIME_DIGITS];
 static bool init_animated = false;
 
 
-static void unload_digit_image_from_slot(int slot_number) {
+static void clear_slot(int slot_number) {
 	bitmap_layer_set_bitmap(
 		digit_layers[slot_number], 
 		gbitmap_create_blank(GSize(0, 0), GBitmapFormat1Bit)
@@ -38,10 +38,6 @@ static void unload_digit_image_from_slot(int slot_number) {
 // Each slot is a quarter of the screen.
 static void load_digit_image_into_slot(int slot_number, int digit_value) {
 	GBitmap *bitmap_to_load = digit_bitmaps[digit_value];
-
-	#ifdef PBL_COLOR
-	replace_gbitmap_color(GColorBlack, time_colour, bitmap_to_load, NULL);
-	#endif
 
 	bitmap_layer_set_bitmap(digit_layers[slot_number], bitmap_to_load);
 
@@ -65,35 +61,49 @@ static void load_digit_image_into_slot(int slot_number, int digit_value) {
 	}
 }
 
-static void display_value(unsigned short value, unsigned short row_number) {
+static void update_slot(int slot_number) {
+	int digit_value = digit_values[slot_number];
+	if (digit_value != UNDEFINED_DIGIT) {
+		// unload digit if it is leading 0 of hour
+		if (digit_value == 0 && slot_number == 0) {
+			clear_slot(slot_number);
+		} else {
+			load_digit_image_into_slot(slot_number, digit_value);
+		}
+	}
+}
+
+static void set_row(unsigned short row_number, unsigned short value) {
 	// extract and display digits by reading units digit,
 	// shifting decimal place and rereading
 	for (int column_number = 1; column_number >= 0; column_number--) {
 		int slot_number = (row_number * 2) + column_number;
 		int current_digit = value % 10;
 
-		// unload digit if it is leading 0 of hour
-		if (current_digit == 0 && column_number == 0 && row_number == 0) {unload_digit_image_from_slot(slot_number);
-		} else {
-			// load digit into slot if different from existing digit
-			if (digit_values[slot_number] == UNDEFINED_DIGIT || digit_values[slot_number] != current_digit) {
-				load_digit_image_into_slot(slot_number, current_digit);
-			}
-		}
-
 		digit_values[slot_number] = current_digit;
+		update_slot(slot_number);
 
 		// shift tens digit into units
 		value = value / 10;
 	}
+}
 
+static void load_digit_bitmaps() {
+	for (int i=0; i<10; i++) {
+		if (digit_bitmaps[i]) {
+			gbitmap_destroy(digit_bitmaps[i]);
+		}
+		digit_bitmaps[i] = gbitmap_create_with_resource(DIGIT_IMAGE_RESOURCE_IDS[i]);
+
+		#ifdef PBL_COLOR
+		replace_gbitmap_color(GColorBlack, time_colour, digit_bitmaps[i], NULL);
+		#endif
+	}
 }
 
 void init_digits(Layer *parent_layer) {
-	// load in bitmaps to memory
-	for (int i=0; i<10; i++) {
-		digit_bitmaps[i] = gbitmap_create_with_resource(DIGIT_IMAGE_RESOURCE_IDS[i]);
-	}
+	// load in digit bitmaps to memory
+	load_digit_bitmaps();
 
 	// determine positions of digits
 	GRect window_bounds = layer_get_bounds(parent_layer);
@@ -103,7 +113,7 @@ void init_digits(Layer *parent_layer) {
 	const int x_offset = window_bounds.size.w/2 - (tile_bounds.size.w + tracking/2);
 	const int y_offset = window_bounds.size.h/2 - tile_bounds.size.h;
 
-	for (int slot_number = 0; slot_number < TOTAL_TIME_DIGITS; slot_number++) {
+	for (int slot_number=0; slot_number<TOTAL_TIME_DIGITS; slot_number++) {
 		GRect frame = GRect(
 			x_offset + ((slot_number % 2) * (tile_bounds.size.w + tracking)),
 			y_offset + ((slot_number / 2) * tile_bounds.size.h),
@@ -118,7 +128,6 @@ void init_digits(Layer *parent_layer) {
 		Layer *digit_layer = bitmap_layer_get_layer(digit_layers[slot_number]);
 		layer_add_child(parent_layer, digit_layer);
 	}
-
 }
 
 void set_digits(unsigned short hour, unsigned short minute) {
@@ -128,20 +137,26 @@ void set_digits(unsigned short hour, unsigned short minute) {
 }
 
 void set_digits_hour(unsigned short value) {
-	display_value(value, 0);
+	set_row(0, value);
 }
 
 void set_digits_minute(unsigned short value) {
-	display_value(value, 1);
+	set_row(1, value);
 }
 
 void set_digits_colour(GColor colour) {
 	time_colour = colour;
+
+	// reload bitmaps to reset replaced colours
+	load_digit_bitmaps();
+	for (int slot_number=0; slot_number<TOTAL_TIME_DIGITS; slot_number++) {
+		update_slot(slot_number);
+	}
 }
 
 void destroy_digits() {
 	for (int i=0; i<TOTAL_TIME_DIGITS; i++) {
-		unload_digit_image_from_slot(i);
+		clear_slot(i);
 		layer_remove_from_parent(bitmap_layer_get_layer(digit_layers[i]));
 		bitmap_layer_destroy(digit_layers[i]);
 		digit_layers[i] = NULL;

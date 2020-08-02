@@ -71,7 +71,6 @@ static void refresh_date_time() {
 
 static void handle_settings_received(void *context) {
 	update_style();
-	refresh_date_time();
 }
 
 #ifdef DEBUGGING_TIME
