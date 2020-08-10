@@ -77,7 +77,7 @@
     "items": [
       {
         "type": "heading",
-        "defaultValue": "Thermometer"
+        "defaultValue": "Temperature Gauge"
       },
       {
         "type": "toggle",
@@ -101,6 +101,13 @@
         "type": "input",
         "messageKey": "WEATHER_API_KEY",
         "label": "Dark Sky API key"
+      },
+      {
+        "type": "toggle",
+        "messageKey": "UPDATE_WEATHER_ON_CONFIG",
+        "label": "Force weather update on save",
+        "defaultValue": false,
+        "description": "Weather is automatically updated every 30 minutes on the hour and half hour (8:00, 8:30, 9:00, etc.). Enable to force weather updates when saving this settings screen."
       }
     ]
   },
