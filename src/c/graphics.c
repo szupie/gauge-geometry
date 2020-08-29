@@ -146,14 +146,12 @@ void update_style() {
 
 	battery_gauge_enabled = enamel_get_BATTERY_GAUGE_ENABLED();
 	temp_enabled = enamel_get_TEMP_ENABLED();
+	check_temp_unit_change();
 	set_temp_range_colour(enamel_get_TEMP_RANGE_COLOUR());
 	set_temp_now_colour(enamel_get_TEMP_NOW_COLOUR());
-
 	layer_set_hidden(temp_range_layer, !temp_enabled);
 	layer_set_hidden(temp_now_layer, !temp_enabled);
 	
-	layer_mark_dirty(temp_range_layer);
-	layer_mark_dirty(temp_now_layer);
 	layer_mark_dirty(hands_layer);
 	layer_mark_dirty(ticks_canvas);
 

@@ -1,119 +1,151 @@
 [
-  {
-    "type": "heading",
-    "defaultValue": "Style configuration"
-  },
-  {
-    "type": "section",
-    "items": [
-      {
-        "type": "heading",
-        "defaultValue": "Date and time"
-      },
-      {
-        "type": "color",
-        "messageKey": "BG_COLOUR",
-        "defaultValue": "FFFFFF",
-        "label": "Background"
-      },
-      {
-        "type": "color",
-        "messageKey": "TIME_COLOUR",
-        "defaultValue": "000000",
-        "label": "Time text"
-      },
-      {
-        "type": "color",
-        "messageKey": "DATE_COLOUR",
-        "defaultValue": "000055",
-        "label": "Date text"
-      },
-      {
-        "type": "color",
-        "messageKey": "HOUR_HAND_COLOUR",
-        "defaultValue": "AA0000",
-        "label": "Hour hand"
-      },
-      {
-        "type": "color",
-        "messageKey": "MINUTE_HAND_COLOUR",
-        "defaultValue": "0055FF",
-        "label": "Minute hand"
-      }
-    ]
-  },
-  {
-    "type": "section",
-    "items": [
-      {
-        "type": "heading",
-        "defaultValue": "Hour indicator marks"
-      },
-      {
-        "type": "color",
-        "messageKey": "TICKS_COLOUR",
-        "defaultValue": "000055",
-        "label": "Colour"
-      },
-      {
-        "type": "slider",
-        "messageKey": "TICKS_SIZE",
-        "defaultValue": 2,
-        "label": "Size",
-        "min": 0,
-        "max": 5
-      },
-      {
-        "type": "toggle",
-        "messageKey": "BATTERY_GAUGE_ENABLED",
-        "label": "Battery indicator",
-        "description": "Show battery usage with hollow indicator marks",
-        "defaultValue": true
-      }
-    ]
-  },
-  {
-    "type": "section",
-    "items": [
-      {
-        "type": "heading",
-        "defaultValue": "Temperature Gauge"
-      },
-      {
-        "type": "toggle",
-        "messageKey": "TEMP_ENABLED",
-        "label": "Show temperature",
-        "defaultValue": true
-      },
-      {
-        "type": "color",
-        "messageKey": "TEMP_NOW_COLOUR",
-        "defaultValue": "AA0000",
-        "label": "Current"
-      },
-      {
-        "type": "color",
-        "messageKey": "TEMP_RANGE_COLOUR",
-        "defaultValue": "FF55AA",
-        "label": "Today’s range"
-      },
-      {
-        "type": "input",
-        "messageKey": "WEATHER_API_KEY",
-        "label": "Dark Sky API key"
-      },
-      {
-        "type": "toggle",
-        "messageKey": "UPDATE_WEATHER_ON_CONFIG",
-        "label": "Force weather update on save",
-        "defaultValue": false,
-        "description": "Weather is automatically updated every 30 minutes on the hour and half hour (8:00, 8:30, 9:00, etc.). Enable to force weather updates when saving this settings screen."
-      }
-    ]
-  },
-  {
-    "type": "submit",
-  	"id": "save-button",
-    "defaultValue": "Save"
-  }
+	{
+		"type": "heading",
+		"defaultValue": "Style configuration"
+	},
+	{
+		"type": "section",
+		"items": [
+			{
+				"type": "heading",
+				"defaultValue": "Date and time"
+			},
+			{
+				"type": "color",
+				"messageKey": "BG_COLOUR",
+				"defaultValue": "FFFFFF",
+				"label": "Background"
+			},
+			{
+				"type": "color",
+				"messageKey": "TIME_COLOUR",
+				"defaultValue": "000000",
+				"label": "Time text"
+			},
+			{
+				"type": "color",
+				"messageKey": "DATE_COLOUR",
+				"defaultValue": "000055",
+				"label": "Date text"
+			},
+			{
+				"type": "color",
+				"messageKey": "HOUR_HAND_COLOUR",
+				"defaultValue": "AA0000",
+				"label": "Hour hand"
+			},
+			{
+				"type": "color",
+				"messageKey": "MINUTE_HAND_COLOUR",
+				"defaultValue": "0055FF",
+				"label": "Minute hand"
+			}
+		]
+	},
+	{
+		"type": "section",
+		"items": [
+			{
+				"type": "heading",
+				"defaultValue": "Hour indicator marks"
+			},
+			{
+				"type": "color",
+				"messageKey": "TICKS_COLOUR",
+				"defaultValue": "000055",
+				"label": "Colour"
+			},
+			{
+				"type": "slider",
+				"messageKey": "TICKS_SIZE",
+				"defaultValue": 2,
+				"label": "Size",
+				"min": 0,
+				"max": 5
+			},
+			{
+				"type": "toggle",
+				"messageKey": "BATTERY_GAUGE_ENABLED",
+				"label": "Battery indicator",
+				"description": "Show battery usage with hollow indicator marks",
+				"defaultValue": true
+			}
+		]
+	},
+	{
+		"type": "section",
+		"items": [
+			{
+				"type": "heading",
+				"defaultValue": "Temperature Gauge"
+			},
+			{
+				"type": "toggle",
+				"messageKey": "TEMP_ENABLED",
+				"label": "Show temperature",
+				"defaultValue": true
+			},
+			{
+				"type": "select",
+				"messageKey": "TEMP_UNIT",
+				"label": "Temperature unit",
+				"defaultValue": "c",
+				"options": [
+					{
+						"label": "°C",
+						"value": "c"
+					},
+					{
+						"label": "°F",
+						"value": "f"
+					}
+				]
+			},
+			{
+				"type": "color",
+				"messageKey": "TEMP_NOW_COLOUR",
+				"defaultValue": "AA0000",
+				"label": "Current"
+			},
+			{
+				"type": "color",
+				"messageKey": "TEMP_RANGE_COLOUR",
+				"defaultValue": "FF55AA",
+				"label": "Today’s range"
+			},
+			{
+				"type": "select",
+				"messageKey": "WEATHER_PROVIDER",
+				"defaultValue": "darksky",
+				"label": "Weather provider",
+				"options": [
+					{ 
+						"label": "Darksky",
+						"value": "darksky" 
+					},
+					{ 
+						"label": "OpenWeather",
+						"value": "owm" 
+					}
+				]
+			},
+			{
+				"type": "input",
+				"messageKey": "WEATHER_API_KEY",
+				"label": "Dark Sky API key"
+			},
+			{
+				"type": "toggle",
+				"messageKey": "UPDATE_WEATHER_ON_CONFIG",
+				"label": "Force weather update on save",
+				"defaultValue": false,
+				"description": "Weather is automatically updated every 30 minutes on the hour and half hour (8:00, 8:30, 9:00, etc.). Enable to force weather updates when saving this settings screen."
+			}
+		]
+	},
+	{
+		"type": "submit",
+		"id": "save-button",
+		"defaultValue": "Save"
+	}
 ]

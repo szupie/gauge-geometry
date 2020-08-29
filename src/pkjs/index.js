@@ -1,13 +1,15 @@
-var Clay = require('pebble-clay');
-var clayConfig = require('./config.json');
-var customClay = require('./custom-clay');
-var clay = new Clay(clayConfig, customClay);
+const Clay = require('pebble-clay');
+const clayConfig = require('./config.json');
+const customClay = require('./custom-clay');
+const clay = new Clay(clayConfig, customClay);
 
-var weatherAPIKey;
-var tempEnabled;
+let weatherProvider;
+let weatherAPIKey;
+let tempUnits;
+let tempEnabled;
 
-var xhrRequest = function (url, type, callback) {
-	var xhr = new XMLHttpRequest();
+function xhrRequest(url, type, callback) {
+	const xhr = new XMLHttpRequest();
 	xhr.onload = function () {
 		callback(this.responseText);
 	};
@@ -15,45 +17,69 @@ var xhrRequest = function (url, type, callback) {
 	xhr.send();
 };
 
+function getWeatherUrl(lat, lon) {
+	const useMetric = (tempUnits === 'c');
+	switch (weatherProvider) {
+		case 'darksky': {
+			const units = useMetric ? 'si' : 'us';
+			return `https://api.darksky.net/forecast/${weatherAPIKey}/${lat},${lon}?units=${units}&exclude=minutely,hourly,alerts,flags`;
+		}
+		case 'owm': {
+			const units = useMetric ? 'metric' : 'imperial';
+			return `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&units=${units}&appid=${weatherAPIKey}&exclude=hourly,minutely`;
+		}
+	}
+}
+
+function parseCurrentMinMaxFor(json) {
+	let now, min, max;
+	switch (weatherProvider) {
+		case 'darksky':
+			now = json.currently.apparentTemperature;
+			min = json.daily.data[0].apparentTemperatureLow;
+			max = json.daily.data[0].apparentTemperatureHigh;
+			break;
+		case 'owm':
+			now = json.current.feels_like;
+			min = json.daily[0].temp.min;
+			max = json.daily[0].temp.max;
+			break;
+	}
+	return [now, min, max];
+}
+
 function locationSuccess(pos) {
 	console.log('Retrieving weather');
 	if (weatherAPIKey) {
-		// Construct URL
-		// var url = `https://api.darksky.net/forecast/${weatherAPIKey}/${pos.coords.latitude},${pos.coords.longitude}?units=si`;
-		var url = 'https://api.darksky.net/forecast/'+weatherAPIKey+'/'+pos.coords.latitude+','+pos.coords.longitude+'?units=si';
+		const url = getWeatherUrl(pos.coords.latitude, pos.coords.longitude);
 
-		xhrRequest(url, 'GET', 
-			function(responseText) {
-				// responseText contains a JSON object with weather info
-				var json = JSON.parse(responseText);
+		xhrRequest(url, 'GET', function(responseText) {
+			// responseText contains a JSON object with weather info
+			const json = JSON.parse(responseText);
 
-				var tempNow = json.currently.apparentTemperature;
-				console.log('Temperature is ' + tempNow);
+			let now, min, max;
+			[now, min, max] = 
+				parseCurrentMinMaxFor(json).map(val => Math.round(val));
 
-				var tempMin = json.daily.data[0].apparentTemperatureLow;
-				console.log('Min is ' + tempMin);
+			console.log(`Current temp: ${now}; min: ${min}; max: ${max}`);
 
-				var tempMax = json.daily.data[0].apparentTemperatureHigh;
-				console.log('Max is ' + tempMax);
+			// Assemble dictionary using our keys
+			const dictionary = {
+				'TEMP_NOW': now,
+				'TEMP_MIN': min,
+				'TEMP_MAX': max,
+			};
 
-				// Assemble dictionary using our keys
-				var dictionary = {
-					'TEMP_NOW': tempNow,
-					'TEMP_MIN': tempMin,
-					'TEMP_MAX': tempMax,
-				};
-
-				// Send to Pebble
-				Pebble.sendAppMessage(dictionary,
-					function(e) {
-						console.log('Weather info sent to Pebble successfully!');
-					},
-					function(e) {
-						console.log('Error sending weather info to Pebble!');
-					}
-				);
-			}      
-		);
+			// Send to Pebble
+			Pebble.sendAppMessage(dictionary,
+				function(e) {
+					console.log('Weather info sent to Pebble successfully!');
+				},
+				function(e) {
+					console.log('Error sending weather info to Pebble!');
+				}
+			);
+		});
 	}
 }
 
@@ -72,11 +98,16 @@ function getWeather() {
 }
 
 Pebble.addEventListener('webviewclosed', function(e) {
-	clay.getSettings(e.response);
 	const claySettings = clay.getSettings(e.response, false);
-	weatherAPIKey = claySettings['WEATHER_API_KEY'].value;
+
+	const tempUnitsChanged = (tempUnits !== claySettings['TEMP_UNIT'].value);
+
 	tempEnabled = claySettings['TEMP_ENABLED'].value;
-	if (claySettings['UPDATE_WEATHER_ON_CONFIG'].value) {
+	tempUnits = claySettings['TEMP_UNIT'].value;
+	weatherProvider = claySettings['WEATHER_PROVIDER'].value;
+	weatherAPIKey = claySettings['WEATHER_API_KEY'].value;
+
+	if (claySettings['UPDATE_WEATHER_ON_CONFIG'].value || tempUnitsChanged) {
 		getWeather();
 	}
 });
@@ -87,9 +118,11 @@ Pebble.addEventListener('ready',
 		console.log('PebbleKit JS ready!');
 
 		if (localStorage.getItem('clay-settings') !== null) {
-			const claySettings = JSON.parse(localStorage.getItem('clay-settings'));
-			weatherAPIKey = claySettings['WEATHER_API_KEY'];
-			tempEnabled = claySettings['TEMP_ENABLED'];
+			const localStorageSettings = JSON.parse(localStorage.getItem('clay-settings'));
+			tempEnabled = localStorageSettings['TEMP_ENABLED'];
+			tempUnits = localStorageSettings['TEMP_UNIT'];
+			weatherProvider = localStorageSettings['WEATHER_PROVIDER'];
+			weatherAPIKey = localStorageSettings['WEATHER_API_KEY'];
 		}
 	}
 );

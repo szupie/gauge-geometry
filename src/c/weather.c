@@ -2,6 +2,8 @@
 #include "weather.h"
 #include "graphics.h"
 
+#include "enamel.h"
+
 uint32_t persist_temp_now = 1;
 uint32_t persist_temp_min = 2;
 uint32_t persist_temp_max = 3;
@@ -10,20 +12,40 @@ static int temp_min, temp_max, temp_now;
 static bool temp_range_defined = false;
 static bool temp_now_defined = false;
 
+static char temp_unit;
+
 static GColor temp_range_colour;
 static GColor temp_now_colour;
+static bool temp_range_colour_defined = false;
+static bool temp_now_colour_defined = false;
 
 static Layer *temp_range_layer, *temp_now_layer;
 
+// Celsius to angle. Minute marks correspond to degrees
+// Gauge on clockface goes clockwise from 0 to 60C
+static int c_to_rad(int degree) {
+	return DEG_TO_TRIGANGLE(degree*360/60);
+}
+// Fahrenheit to angle. Every hour mark corresponds to 10F
+// Gauge on clockface goes clockwise from 0 to 120F
+static int f_to_rad(int degree) {
+	return DEG_TO_TRIGANGLE(degree*360/120);
+}
 
-static int minute_to_rad(int minute) {
-	return DEG_TO_TRIGANGLE(minute*360/60);
+static int degree_to_rad(int degree) {
+	switch (temp_unit) {
+		case 'f':
+			return f_to_rad(degree);
+		case 'c':
+		default:
+			return c_to_rad(degree);
+	}
 }
 
 static void temp_now_update_proc(Layer *layer, GContext *ctx) {
-	if (temp_now_defined) {
+	if (temp_now_defined && temp_now_colour_defined) {
 		GRect bounds = layer_get_bounds(layer);
-		int temp_angle = minute_to_rad(temp_now);
+		int temp_angle = degree_to_rad(temp_now);
 
 		// graphics_context_set_fill_color(ctx, GColorDarkCandyAppleRed);
 		// graphics_fill_radial(ctx, bounds, GOvalScaleModeFitCircle, RING_INSET*2, temp_angle, temp_angle);
@@ -38,10 +60,10 @@ static void temp_now_update_proc(Layer *layer, GContext *ctx) {
 }
 
 static void temp_range_update_proc(Layer *layer, GContext *ctx) {
-	if (temp_range_defined) {
+	if (temp_range_defined && temp_range_colour_defined) {
 		GRect bounds = layer_get_bounds(layer);
 		graphics_context_set_fill_color(ctx, temp_range_colour);
-		graphics_fill_radial(ctx, bounds, GOvalScaleModeFitCircle, TEMP_RANGE_WIDTH, minute_to_rad(temp_min), minute_to_rad(temp_max));
+		graphics_fill_radial(ctx, bounds, GOvalScaleModeFitCircle, TEMP_RANGE_WIDTH, degree_to_rad(temp_min), degree_to_rad(temp_max));
 	}
 }
 
@@ -50,6 +72,8 @@ void init_weather(Layer *range_layer, Layer *now_layer) {
 	temp_now_layer = now_layer;
 	layer_set_update_proc(temp_range_layer, temp_range_update_proc);
 	layer_set_update_proc(temp_now_layer, temp_now_update_proc);
+
+	temp_unit = enamel_get_TEMP_UNIT()[0];
 
 	if (persist_exists(persist_temp_min) && persist_exists(persist_temp_max)) {
 		update_temp_range(
@@ -65,11 +89,35 @@ void init_weather(Layer *range_layer, Layer *now_layer) {
 }
 
 void set_temp_range_colour(GColor colour) {
-	temp_range_colour = colour;
+	if (!temp_range_colour_defined || !gcolor_equal(temp_range_colour, colour)) {
+		temp_range_colour = colour;
+		layer_mark_dirty(temp_range_layer);
+	}
+	temp_range_colour_defined = true;
 }
 
 void set_temp_now_colour(GColor colour) {
-	temp_now_colour = colour;
+	if (!temp_now_colour_defined || !gcolor_equal(temp_now_colour, colour)) {
+		temp_now_colour = colour;
+		layer_mark_dirty(temp_now_layer);
+	}
+	temp_now_colour_defined = true;
+}
+
+void check_temp_unit_change() {
+	char latest_unit = enamel_get_TEMP_UNIT()[0];
+	// Clear cached temps when switching units as old values become nonsense
+	if (latest_unit != temp_unit) {
+		persist_delete(persist_temp_now);
+		persist_delete(persist_temp_min);
+		persist_delete(persist_temp_max);
+		temp_range_defined = false;
+		temp_now_defined = false;
+
+		layer_mark_dirty(temp_range_layer);
+		layer_mark_dirty(temp_now_layer);
+	}
+	temp_unit = latest_unit;
 }
 
 void update_temp_range(int min, int max) {
@@ -93,21 +141,16 @@ void handle_weather_update(DictionaryIterator *iterator, void *context) {
 
 	// If temp range is available
 	if(temp_min_tuple && temp_max_tuple) {
-		temp_min = (int)temp_min_tuple->value->int32;
-		temp_max = (int)temp_max_tuple->value->int32;
-		temp_range_defined = true;
-
+		update_temp_range(
+			(int)temp_min_tuple->value->int32,
+			(int)temp_max_tuple->value->int32
+		);
 		persist_write_int(persist_temp_min, temp_min);
 		persist_write_int(persist_temp_max, temp_max);
-
-		layer_mark_dirty(temp_range_layer);
 	}
 
 	if(temp_now_tuple) {
-		temp_now = (int)temp_now_tuple->value->int32;
-		temp_now_defined = true;
-
+		update_temp_now((int)temp_now_tuple->value->int32);
 		persist_write_int(persist_temp_now, temp_now);
-		layer_mark_dirty(temp_now_layer);
 	}
 }
