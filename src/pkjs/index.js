@@ -84,6 +84,41 @@ function requestOwm(lat, lon) {
 	});
 }
 
+function requestWeatherbit(lat, lon) {
+	const units = (tempUnits === 'c') ? 'M' : 'I';
+	const query = `lat=${lat}&lon=${lon}&units=${units}&key=${weatherAPIKey}`;
+
+	const nowEndpoint = `https://api.weatherbit.io/v2.0/current?${query}`;
+	const nowRequest = xhrRequest(nowEndpoint).then(responseText => {
+		const json = JSON.parse(responseText);
+		if (tempFeelsLike) {
+			return json.data[0].app_temp;
+		} else {
+			return json.data[0].temp;
+		}
+	});
+
+	const dailyEndpoint = `https://api.weatherbit.io/v2.0/forecast/daily?days=1&${query}`;
+	const dailyRequest = xhrRequest(dailyEndpoint).then(responseText => {
+		const json = JSON.parse(responseText);
+		let min, max;
+		if (tempFeelsLike) {
+			min = json.data[0].app_min_temp;
+			max = json.data[0].app_max_temp;
+		} else {
+			min = json.data[0].min_temp;
+			max = json.data[0].max_temp;
+		}
+		return [min, max];
+	});
+
+	return Promise.all([nowRequest, dailyRequest]).then(results => {
+		const now = results[0]
+		const minMax = results[1];
+		return [now, minMax[0], minMax[1]];
+	});
+}
+
 function locationSuccess(pos) {
 	console.log('Retrieving weather');
 	if (weatherAPIKey) {
@@ -99,6 +134,9 @@ function locationSuccess(pos) {
 				break;
 			case 'owm':
 				weatherPromise = requestOwm(lat, lon);
+				break;
+			case 'weatherbit':
+				weatherPromise = requestWeatherbit(lat, lon);
 				break;
 		}
 

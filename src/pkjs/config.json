@@ -136,6 +136,10 @@
 					{ 
 						"label": "OpenWeather",
 						"value": "owm" 
+					},
+					{ 
+						"label": "Weatherbit",
+						"value": "weatherbit" 
 					}
 				]
 			},
