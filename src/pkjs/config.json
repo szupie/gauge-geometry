@@ -126,8 +126,12 @@
 				"label": "Weather provider",
 				"options": [
 					{ 
-						"label": "Darksky",
+						"label": "Dark Sky",
 						"value": "darksky" 
+					},
+					{ 
+						"label": "ClimaCell",
+						"value": "climacell" 
 					},
 					{ 
 						"label": "OpenWeather",
@@ -138,7 +142,7 @@
 			{
 				"type": "input",
 				"messageKey": "WEATHER_API_KEY",
-				"label": "Dark Sky API key"
+				"label": "API key"
 			},
 			{
 				"type": "toggle",

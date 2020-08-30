@@ -9,68 +9,103 @@ let tempFeelsLike;
 let weatherProvider;
 let weatherAPIKey;
 
-function xhrRequest(url, type, callback) {
-	const xhr = new XMLHttpRequest();
-	xhr.onload = function () {
-		callback(this.responseText);
-	};
-	xhr.open(type, url);
-	xhr.send();
+function xhrRequest(url) {
+	return new Promise((resolve, reject) => {
+		const xhr = new XMLHttpRequest();
+		const type = "GET";
+		xhr.onload = function() { resolve(xhr.response); };
+		xhr.onerror = reject;
+		xhr.open(type, url);
+		xhr.send();
+	});
 };
 
-function getWeatherUrl(lat, lon) {
-	const useMetric = (tempUnits === 'c');
-	switch (weatherProvider) {
-		case 'darksky': {
-			const units = useMetric ? 'si' : 'us';
-			return `https://api.darksky.net/forecast/${weatherAPIKey}/${lat},${lon}?units=${units}&exclude=minutely,hourly,alerts,flags`;
+function requestDarksky(lat, lon) {
+	const units = (tempUnits === 'c') ? 'si' : 'us';
+	const url = `https://api.darksky.net/forecast/${weatherAPIKey}/${lat},${lon}?units=${units}&exclude=minutely,hourly,alerts,flags`;
+
+	return xhrRequest(url).then(responseText => {
+		const json = JSON.parse(responseText);
+		let now, min, max;
+		if (tempFeelsLike) {
+			now = json.currently.apparentTemperature;
+			min = json.daily.data[0].apparentTemperatureLow;
+			max = json.daily.data[0].apparentTemperatureHigh;
+		} else {
+			now = json.currently.temperature;
+			min = json.daily.data[0].temperatureLow;
+			max = json.daily.data[0].temperatureHigh;
 		}
-		case 'owm': {
-			const units = useMetric ? 'metric' : 'imperial';
-			return `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&units=${units}&appid=${weatherAPIKey}&exclude=hourly,minutely`;
-		}
-	}
+		return [now, min, max];
+	});
 }
 
-function parseCurrentMinMaxFor(json) {
-	let now, min, max;
-	switch (weatherProvider) {
-		case 'darksky':
-			if (tempFeelsLike) {
-				now = json.currently.apparentTemperature;
-				min = json.daily.data[0].apparentTemperatureLow;
-				max = json.daily.data[0].apparentTemperatureHigh;
-			} else {
-				now = json.currently.temperature;
-				min = json.daily.data[0].temperatureLow;
-				max = json.daily.data[0].temperatureHigh;
-			}
-			break;
-		case 'owm':
-			if (tempFeelsLike) {
-				now = json.current.feels_like;
-			} else {
-				now = json.current.temp;
-			}
-			min = json.daily[0].temp.min;
-			max = json.daily[0].temp.max;
-			break;
-	}
-	return [now, min, max];
+function requestClimacell(lat, lon) {
+	const units = (tempUnits === 'c') ? 'si' : 'us';
+	const tempField = tempFeelsLike ? 'feels_like' : 'temp';
+	const query = `lat=${lat}&lon=${lon}&unit_system=${units}&fields=${tempField}&apikey=${weatherAPIKey}`;
+
+	const nowEndpoint = `https://api.climacell.co/v3/weather/realtime?${query}`;
+	const nowRequest = xhrRequest(nowEndpoint).then(responseText => {
+		const json = JSON.parse(responseText);
+		return json[tempField].value;
+	});
+
+	const dailyEndpoint = `https://api.climacell.co/v3/weather/forecast/daily?start_time=now&${query}`;
+	const dailyRequest = xhrRequest(dailyEndpoint).then(responseText => {
+		const json = JSON.parse(responseText);
+		const min = json[0][tempField][0].min.value;
+		const max = json[0][tempField][1].max.value;
+		return [min, max];
+	});
+
+	return Promise.all([nowRequest, dailyRequest]).then(results => {
+		const now = results[0]
+		const minMax = results[1];
+		return [now, minMax[0], minMax[1]];
+	});
+}
+
+function requestOwm(lat, lon) {
+	const units = (tempUnits === 'c') ? 'metric' : 'imperial';
+	const url = `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&units=${units}&appid=${weatherAPIKey}&exclude=hourly,minutely`;
+
+	return xhrRequest(url).then(responseText => {
+		const json = JSON.parse(responseText);
+		let now, min, max;
+		if (tempFeelsLike) {
+			now = json.current.feels_like;
+		} else {
+			now = json.current.temp;
+		}
+		min = json.daily[0].temp.min;
+		max = json.daily[0].temp.max;
+		return [now, min, max];
+	});
 }
 
 function locationSuccess(pos) {
 	console.log('Retrieving weather');
 	if (weatherAPIKey) {
-		const url = getWeatherUrl(pos.coords.latitude, pos.coords.longitude);
+		const lat = pos.coords.latitude;
+		const lon = pos.coords.longitude;
+		let weatherPromise;
+		switch (weatherProvider) {
+			case 'darksky':
+				weatherPromise = requestDarksky(lat, lon);
+				break;
+			case 'climacell':
+				weatherPromise = requestClimacell(lat, lon);
+				break;
+			case 'owm':
+				weatherPromise = requestOwm(lat, lon);
+				break;
+		}
 
-		xhrRequest(url, 'GET', function(responseText) {
-			// responseText contains a JSON object with weather info
-			const json = JSON.parse(responseText);
+		weatherPromise.then(nowMinMaxTuple => {
 
 			let now, min, max;
-			[now, min, max] = 
-				parseCurrentMinMaxFor(json).map(val => Math.round(val));
+			[now, min, max] = nowMinMaxTuple.map(val => Math.round(val));
 
 			console.log(`Current temp: ${now}; min: ${min}; max: ${max}`);
 
