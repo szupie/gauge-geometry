@@ -102,6 +102,12 @@
 				]
 			},
 			{
+				"type": "toggle",
+				"messageKey": "TEMP_FEELS_LIKE",
+				"label": "Use “feels like” temperature",
+				"defaultValue": true
+			},
+			{
 				"type": "color",
 				"messageKey": "TEMP_NOW_COLOUR",
 				"defaultValue": "AA0000",

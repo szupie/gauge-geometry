@@ -3,10 +3,11 @@ const clayConfig = require('./config.json');
 const customClay = require('./custom-clay');
 const clay = new Clay(clayConfig, customClay);
 
+let tempEnabled;
+let tempUnits;
+let tempFeelsLike;
 let weatherProvider;
 let weatherAPIKey;
-let tempUnits;
-let tempEnabled;
 
 function xhrRequest(url, type, callback) {
 	const xhr = new XMLHttpRequest();
@@ -35,12 +36,22 @@ function parseCurrentMinMaxFor(json) {
 	let now, min, max;
 	switch (weatherProvider) {
 		case 'darksky':
-			now = json.currently.apparentTemperature;
-			min = json.daily.data[0].apparentTemperatureLow;
-			max = json.daily.data[0].apparentTemperatureHigh;
+			if (tempFeelsLike) {
+				now = json.currently.apparentTemperature;
+				min = json.daily.data[0].apparentTemperatureLow;
+				max = json.daily.data[0].apparentTemperatureHigh;
+			} else {
+				now = json.currently.temperature;
+				min = json.daily.data[0].temperatureLow;
+				max = json.daily.data[0].temperatureHigh;
+			}
 			break;
 		case 'owm':
-			now = json.current.feels_like;
+			if (tempFeelsLike) {
+				now = json.current.feels_like;
+			} else {
+				now = json.current.temp;
+			}
 			min = json.daily[0].temp.min;
 			max = json.daily[0].temp.max;
 			break;
@@ -104,6 +115,7 @@ Pebble.addEventListener('webviewclosed', function(e) {
 
 	tempEnabled = claySettings['TEMP_ENABLED'].value;
 	tempUnits = claySettings['TEMP_UNIT'].value;
+	tempFeelsLike = claySettings['TEMP_FEELS_LIKE'].value;
 	weatherProvider = claySettings['WEATHER_PROVIDER'].value;
 	weatherAPIKey = claySettings['WEATHER_API_KEY'].value;
 
@@ -121,6 +133,7 @@ Pebble.addEventListener('ready',
 			const localStorageSettings = JSON.parse(localStorage.getItem('clay-settings'));
 			tempEnabled = localStorageSettings['TEMP_ENABLED'];
 			tempUnits = localStorageSettings['TEMP_UNIT'];
+			tempFeelsLike = localStorageSettings['TEMP_FEELS_LIKE'];
 			weatherProvider = localStorageSettings['WEATHER_PROVIDER'];
 			weatherAPIKey = localStorageSettings['WEATHER_API_KEY'];
 		}
