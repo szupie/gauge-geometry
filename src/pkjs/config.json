@@ -1,7 +1,8 @@
 [
 	{
 		"type": "heading",
-		"defaultValue": "Style configuration"
+		"defaultValue": "Style configuration",
+		"size": 3
 	},
 	{
 		"type": "section",
@@ -83,7 +84,42 @@
 				"type": "toggle",
 				"messageKey": "TEMP_ENABLED",
 				"label": "Show temperature",
-				"defaultValue": true
+				"defaultValue": false
+			},
+			{
+				"type": "select",
+				"messageKey": "WEATHER_PROVIDER",
+				"defaultValue": "none",
+				"label": "Weather provider",
+				"options": [
+					{ 
+						"label": "None",
+						"value": "none"
+					},
+					{ 
+						"label": "Dark Sky",
+						"value": "darksky"
+					},
+					{ 
+						"label": "ClimaCell",
+						"value": "climacell"
+					},
+					{ 
+						"label": "OpenWeather",
+						"value": "owm"
+					},
+					{ 
+						"label": "Weatherbit",
+						"value": "weatherbit"
+					}
+				],
+				"description": "Weather API requests are made every 30 minutes on the hour and half hour (8:00, 8:30, 9:00, etc.)"
+			},
+			{
+				"type": "input",
+				"messageKey": "WEATHER_API_KEY",
+				"label": "API key",
+				"group": "weatherDetails"
 			},
 			{
 				"type": "select",
@@ -99,61 +135,37 @@
 						"label": "°F",
 						"value": "f"
 					}
-				]
+				],
+				"group": "weatherDetails"
 			},
 			{
 				"type": "toggle",
 				"messageKey": "TEMP_FEELS_LIKE",
 				"label": "Use “feels like” temperature",
-				"defaultValue": true
+				"defaultValue": true,
+				"group": "weatherDetails"
 			},
 			{
 				"type": "color",
 				"messageKey": "TEMP_NOW_COLOUR",
 				"defaultValue": "AA0000",
-				"label": "Current"
+				"label": "Current temperature indicator",
+				"group": "weatherDetails"
 			},
 			{
 				"type": "color",
 				"messageKey": "TEMP_RANGE_COLOUR",
 				"defaultValue": "FF55AA",
-				"label": "Today’s range"
-			},
-			{
-				"type": "select",
-				"messageKey": "WEATHER_PROVIDER",
-				"defaultValue": "darksky",
-				"label": "Weather provider",
-				"options": [
-					{ 
-						"label": "Dark Sky",
-						"value": "darksky" 
-					},
-					{ 
-						"label": "ClimaCell",
-						"value": "climacell" 
-					},
-					{ 
-						"label": "OpenWeather",
-						"value": "owm" 
-					},
-					{ 
-						"label": "Weatherbit",
-						"value": "weatherbit" 
-					}
-				]
-			},
-			{
-				"type": "input",
-				"messageKey": "WEATHER_API_KEY",
-				"label": "API key"
+				"label": "Daily high/low temperature range",
+				"group": "weatherDetails"
 			},
 			{
 				"type": "toggle",
 				"messageKey": "UPDATE_WEATHER_ON_CONFIG",
 				"label": "Force weather update on save",
 				"defaultValue": false,
-				"description": "Weather is automatically updated every 30 minutes on the hour and half hour (8:00, 8:30, 9:00, etc.). Enable to force weather updates when saving this settings screen."
+				"description": "Enable to trigger new weather requests when saving this screen",
+				"group": "weatherDetails"
 			}
 		]
 	},
