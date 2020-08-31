@@ -9,25 +9,7 @@
 		"items": [
 			{
 				"type": "heading",
-				"defaultValue": "Date and time"
-			},
-			{
-				"type": "color",
-				"messageKey": "BG_COLOUR",
-				"defaultValue": "FFFFFF",
-				"label": "Background"
-			},
-			{
-				"type": "color",
-				"messageKey": "TIME_COLOUR",
-				"defaultValue": "000000",
-				"label": "Time text"
-			},
-			{
-				"type": "color",
-				"messageKey": "DATE_COLOUR",
-				"defaultValue": "000055",
-				"label": "Date text"
+				"defaultValue": "Time and date"
 			},
 			{
 				"type": "color",
@@ -40,6 +22,24 @@
 				"messageKey": "MINUTE_HAND_COLOUR",
 				"defaultValue": "0055FF",
 				"label": "Minute hand"
+			},
+			{
+				"type": "color",
+				"messageKey": "TIME_COLOUR",
+				"defaultValue": "000000",
+				"label": "Digital time"
+			},
+			{
+				"type": "color",
+				"messageKey": "DATE_COLOUR",
+				"defaultValue": "000055",
+				"label": "Date"
+			},
+			{
+				"type": "color",
+				"messageKey": "BG_COLOUR",
+				"defaultValue": "FFFFFF",
+				"label": "Background"
 			}
 		]
 	},
@@ -68,7 +68,7 @@
 				"type": "toggle",
 				"messageKey": "BATTERY_GAUGE_ENABLED",
 				"label": "Battery indicator",
-				"description": "Show battery usage with hollow indicator marks",
+				"description": "Hour marks become hollow as battery depletes",
 				"defaultValue": true
 			}
 		]
@@ -112,14 +112,14 @@
 						"label": "Weatherbit",
 						"value": "weatherbit"
 					}
-				],
-				"description": "Weather API requests are made every 30 minutes on the hour and half hour (8:00, 8:30, 9:00, etc.)"
+				]
 			},
 			{
 				"type": "input",
 				"messageKey": "WEATHER_API_KEY",
 				"label": "API key",
-				"group": "weatherDetails"
+				"group": "weatherDetails",
+				"description": "Weather API requests are made every 30 minutes on the hour and half hour (8:00, 8:30, 9:00, etc.)"
 			},
 			{
 				"type": "select",
