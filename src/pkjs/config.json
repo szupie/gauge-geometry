@@ -87,6 +87,11 @@
 				"defaultValue": false
 			},
 			{
+				"type": "heading",
+				"defaultValue": "API Settings",
+				"size": "4"
+			},
+			{
 				"type": "select",
 				"messageKey": "WEATHER_PROVIDER",
 				"defaultValue": "none",
@@ -122,6 +127,18 @@
 				"description": "Weather API requests are made every 30 minutes on the hour and half hour (8:00, 8:30, 9:00, etc.)"
 			},
 			{
+				"type": "toggle",
+				"messageKey": "UPDATE_WEATHER_ON_CONFIG",
+				"label": "Trigger weather request on save",
+				"defaultValue": false,
+				"group": "weatherDetails"
+			},
+			{
+				"type": "heading",
+				"defaultValue": "Appearance Settings",
+				"size": "4"
+			},
+			{
 				"type": "select",
 				"messageKey": "TEMP_UNIT",
 				"label": "Temperature unit",
@@ -136,7 +153,8 @@
 						"value": "f"
 					}
 				],
-				"group": "weatherDetails"
+				"group": "weatherDetails",
+				"description": "<div id='temp_dial'><span class='label' data-c='-10' data-f='0'></span><span class='label' data-c='0' data-f='30'></span><span class='label' data-c='15' data-f='60'></span><span class='label' data-c='30' data-f='90'></span></div><p id='temp_explain'><span class='celsius'>Temperature in °C corresponds to minute marks</span><span class='fahrenheit'>Every hour mark corresponds to 10°F</span></p>"
 			},
 			{
 				"type": "toggle",
@@ -157,14 +175,6 @@
 				"messageKey": "TEMP_RANGE_COLOUR",
 				"defaultValue": "FF55AA",
 				"label": "Daily high/low temperature range",
-				"group": "weatherDetails"
-			},
-			{
-				"type": "toggle",
-				"messageKey": "UPDATE_WEATHER_ON_CONFIG",
-				"label": "Force weather update on save",
-				"defaultValue": false,
-				"description": "Enable to trigger new weather requests when saving this screen",
 				"group": "weatherDetails"
 			}
 		]
