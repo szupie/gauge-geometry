@@ -21,6 +21,18 @@ module.exports = function(minified) {
 			'$backgroundRepeat': 'no-repeat'
 		});
 
+		// Style subsection headings
+		$('.component-heading:not(:first-child)').each(item => {
+			$(item).set('$paddingBottom', '0.5rem');
+			$('h6', item).set({
+				'$color': '#a4a4a4',
+				'$textTransform': 'uppercase'
+			});
+		});
+		$(':not(.component-heading) + .component-heading').each(item => {
+			$('h6', item).set('$marginTop', '2rem');
+		});
+
 
 		// Style diagram for temperature dial
 		const tempUnitInput = clayConfig.getItemByMessageKey('TEMP_UNIT');

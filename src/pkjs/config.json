@@ -81,15 +81,15 @@
 				"defaultValue": "Temperature Gauge"
 			},
 			{
+				"type": "heading",
+				"defaultValue": "API Settings",
+				"size": "6"
+			},
+			{
 				"type": "toggle",
 				"messageKey": "TEMP_ENABLED",
 				"label": "Show temperature",
 				"defaultValue": false
-			},
-			{
-				"type": "heading",
-				"defaultValue": "API Settings",
-				"size": "4"
 			},
 			{
 				"type": "select",
@@ -136,7 +136,7 @@
 			{
 				"type": "heading",
 				"defaultValue": "Appearance Settings",
-				"size": "4"
+				"size": "6"
 			},
 			{
 				"type": "select",
@@ -154,7 +154,7 @@
 					}
 				],
 				"group": "weatherDetails",
-				"description": "<div id='temp_dial'><span class='label' data-c='-10' data-f='0'></span><span class='label' data-c='0' data-f='30'></span><span class='label' data-c='15' data-f='60'></span><span class='label' data-c='30' data-f='90'></span></div><p id='temp_explain'><span class='celsius'>Temperature in °C corresponds to minute marks</span><span class='fahrenheit'>Every hour mark corresponds to 10°F</span></p>"
+				"description": "<div id='temp_dial'><span class='label' data-c='-10' data-f='0'></span><span class='label' data-c='0' data-f='30'></span><span class='label' data-c='15' data-f='60'></span><span class='label' data-c='30' data-f='90'></span></div><p id='temp_explain'>Position of indicators along the edge of the dial indicate the current temperature and daily high/low range, <span class='celsius'>with minute marks corresponding to °C</span><span class='fahrenheit'>with each hour mark corresponding to 10°F</span></p>"
 			},
 			{
 				"type": "toggle",
