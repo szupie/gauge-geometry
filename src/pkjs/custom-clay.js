@@ -11,7 +11,7 @@ module.exports = function(minified) {
 			'$backgroundColor': '#333333'
 		});
 
-		// Add notch marks to slider input to make sizing options clearer
+		// Add notch marks to slider input to make sizing increments clearer
 		const ticksSizeInput = $('input.slider', clayConfig.getItemByMessageKey('TICKS_SIZE').$element);
 		const sliderCount = ticksSizeInput.get('@max');
 		ticksSizeInput.set({
@@ -33,6 +33,24 @@ module.exports = function(minified) {
 			$('h6', item).set('$marginTop', '2rem');
 		});
 
+		// Weather request can only be triggered on save, 
+		// so make button toggle hidden setting that gets reset every time
+		const forceWeatherToggle = clayConfig.getItemByMessageKey('UPDATE_WEATHER_ON_CONFIG');
+		const fetchWeatherButton = clayConfig.getItemById('fetchWeather');
+
+		forceWeatherToggle.hide();
+		forceWeatherToggle.set(false);
+		$('button', fetchWeatherButton.$element).set({
+			'$backgroundColor': '#666',
+			'$marginBottom': '0',
+			'$textTransform': 'none',
+			'$paddingLeft': '1rem',
+			'$paddingRight': '1rem',
+			'$fontWeight': 'normal'
+		});
+		fetchWeatherButton.on('click', function() {
+			forceWeatherToggle.set(true);
+		});
 
 		// Style diagram for temperature dial
 		const tempUnitInput = clayConfig.getItemByMessageKey('TEMP_UNIT');

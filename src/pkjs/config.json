@@ -134,6 +134,12 @@
 				"group": "weatherDetails"
 			},
 			{
+				"type": "submit",
+				"id": "fetchWeather",
+				"defaultValue": "Save and request weather now",
+				"group": "weatherDetails"
+			},
+			{
 				"type": "heading",
 				"defaultValue": "Appearance Settings",
 				"size": "6"
