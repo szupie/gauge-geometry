@@ -160,7 +160,7 @@
 					}
 				],
 				"group": "weatherDetails",
-				"description": "<div id='temp_dial'><span class='label' data-c='-10' data-f='0'></span><span class='label' data-c='0' data-f='30'></span><span class='label' data-c='15' data-f='60'></span><span class='label' data-c='30' data-f='90'></span></div><p id='temp_explain'>Position of indicators along the edge of the dial indicate the current temperature and daily high/low range, <span class='celsius'>with minute marks corresponding to °C</span><span class='fahrenheit'>with each hour mark corresponding to 10°F</span></p>"
+				"description": "<div id='temp_dial'><div class='markers'></div><div class='indicator current'></div><div class='indicator range'></div></div><div id='temp_sample'><h6>Sample readout</h6><p>Current, High/Low:</p><p class='celsius'>20°, 25°/15°</p><p class='fahrenheit'>70°, 80°/60°</p></div><p id='temp_explain'>Temperature is indicated by the position of indicators along the edge of the dial, <span class='celsius'>with minute marks corresponding to °C</span><span class='fahrenheit'>with each hour mark corresponding to 10°F</span></p>"
 			},
 			{
 				"type": "toggle",
