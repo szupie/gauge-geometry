@@ -1,110 +1,110 @@
 {
-  "name": "gauge-symmetry",
-  "author": "szupie",
-  "version": "1.0.0",
-  "keywords": [
-    "pebble-app"
-  ],
-  "private": true,
-  "dependencies": {
-    "enamel": "^1.2.5",
-    "pebble-clay": "^1.0.4",
-    "pebble-events": "^1.2.0"
-  },
-  "pebble": {
-    "displayName": "Gauge Symmetry",
-    "uuid": "6800361b-7e42-4358-9fee-ee4c5fd0386d",
-    "sdkVersion": "3",
-    "enableMultiJS": true,
-    "targetPlatforms": [
-      "chalk"
-    ],
-    "watchapp": {
-      "watchface": true
-    },
-    "capabilities": [
-      "location"
-    ],
-    "messageKeys": [
-      "BG_COLOUR",
-      "TIME_COLOUR",
-      "DATE_COLOUR",
-      "HOUR_HAND_COLOUR",
-      "MINUTE_HAND_COLOUR",
-      "TICKS_COLOUR",
-      "TICKS_SIZE",
-      "BATTERY_GAUGE_ENABLED",
-      "TEMP_ENABLED",
-      "TEMP_UNIT",
-      "TEMP_FEELS_LIKE",
-      "WEATHER_PROVIDER",
-      "WEATHER_API_KEY",
-      "UPDATE_WEATHER_ON_CONFIG",
-      "TEMP_NOW_COLOUR",
-      "TEMP_RANGE_COLOUR",
-      "TEMP_NOW",
-      "TEMP_MIN",
-      "TEMP_MAX"
-    ],
-    "resources": {
-      "media": [
-        {
-          "type": "font",
-          "name": "POPPINS_16",
-          "file": "Poppins-SemiBold.ttf",
-          "characterRegex": "[A-Za-z0-9 ]"
-        },
-        {
-          "type": "bitmap",
-          "name": "CENTURY_GOTHIC_0",
-          "file": "century-gothic/0.png"
-        },
-        {
-          "type": "bitmap",
-          "name": "CENTURY_GOTHIC_1",
-          "file": "century-gothic/1.png"
-        },
-        {
-          "type": "bitmap",
-          "name": "CENTURY_GOTHIC_2",
-          "file": "century-gothic/2.png"
-        },
-        {
-          "type": "bitmap",
-          "name": "CENTURY_GOTHIC_3",
-          "file": "century-gothic/3.png"
-        },
-        {
-          "type": "bitmap",
-          "name": "CENTURY_GOTHIC_4",
-          "file": "century-gothic/4.png"
-        },
-        {
-          "type": "bitmap",
-          "name": "CENTURY_GOTHIC_5",
-          "file": "century-gothic/5.png"
-        },
-        {
-          "type": "bitmap",
-          "name": "CENTURY_GOTHIC_6",
-          "file": "century-gothic/6.png"
-        },
-        {
-          "type": "bitmap",
-          "name": "CENTURY_GOTHIC_7",
-          "file": "century-gothic/7.png"
-        },
-        {
-          "type": "bitmap",
-          "name": "CENTURY_GOTHIC_8",
-          "file": "century-gothic/8.png"
-        },
-        {
-          "type": "bitmap",
-          "name": "CENTURY_GOTHIC_9",
-          "file": "century-gothic/9.png"
-        }
-      ]
-    }
-  }
+	"name": "gauge-geometry",
+	"author": "szupie",
+	"version": "1.0.0",
+	"keywords": [
+		"pebble-app"
+	],
+	"private": true,
+	"dependencies": {
+		"enamel": "^1.2.5",
+		"pebble-clay": "^1.0.4",
+		"pebble-events": "^1.2.0"
+	},
+	"pebble": {
+		"displayName": "Gauge Geometry",
+		"uuid": "6800361b-7e42-4358-9fee-ee4c5fd0386d",
+		"sdkVersion": "3",
+		"enableMultiJS": true,
+		"targetPlatforms": [
+			"chalk"
+		],
+		"watchapp": {
+			"watchface": true
+		},
+		"capabilities": [
+			"location"
+		],
+		"messageKeys": [
+			"BG_COLOUR",
+			"TIME_COLOUR",
+			"DATE_COLOUR",
+			"HOUR_HAND_COLOUR",
+			"MINUTE_HAND_COLOUR",
+			"TICKS_COLOUR",
+			"TICKS_SIZE",
+			"BATTERY_GAUGE_ENABLED",
+			"TEMP_ENABLED",
+			"TEMP_UNIT",
+			"TEMP_FEELS_LIKE",
+			"WEATHER_PROVIDER",
+			"WEATHER_API_KEY",
+			"UPDATE_WEATHER_ON_CONFIG",
+			"TEMP_NOW_COLOUR",
+			"TEMP_RANGE_COLOUR",
+			"TEMP_NOW",
+			"TEMP_MIN",
+			"TEMP_MAX"
+		],
+		"resources": {
+			"media": [
+				{
+					"type": "font",
+					"name": "POPPINS_16",
+					"file": "Poppins-SemiBold.ttf",
+					"characterRegex": "[A-Za-z0-9 ]"
+				},
+				{
+					"type": "bitmap",
+					"name": "CENTURY_GOTHIC_0",
+					"file": "century-gothic/0.png"
+				},
+				{
+					"type": "bitmap",
+					"name": "CENTURY_GOTHIC_1",
+					"file": "century-gothic/1.png"
+				},
+				{
+					"type": "bitmap",
+					"name": "CENTURY_GOTHIC_2",
+					"file": "century-gothic/2.png"
+				},
+				{
+					"type": "bitmap",
+					"name": "CENTURY_GOTHIC_3",
+					"file": "century-gothic/3.png"
+				},
+				{
+					"type": "bitmap",
+					"name": "CENTURY_GOTHIC_4",
+					"file": "century-gothic/4.png"
+				},
+				{
+					"type": "bitmap",
+					"name": "CENTURY_GOTHIC_5",
+					"file": "century-gothic/5.png"
+				},
+				{
+					"type": "bitmap",
+					"name": "CENTURY_GOTHIC_6",
+					"file": "century-gothic/6.png"
+				},
+				{
+					"type": "bitmap",
+					"name": "CENTURY_GOTHIC_7",
+					"file": "century-gothic/7.png"
+				},
+				{
+					"type": "bitmap",
+					"name": "CENTURY_GOTHIC_8",
+					"file": "century-gothic/8.png"
+				},
+				{
+					"type": "bitmap",
+					"name": "CENTURY_GOTHIC_9",
+					"file": "century-gothic/9.png"
+				}
+			]
+		}
+	}
 }
