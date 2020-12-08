@@ -19,20 +19,33 @@ static GColor ticks_colour;
 static int ticks_size;
 
 static bool battery_gauge_enabled;
-static bool temp_enabled;
 
+static GPoint tick_positions[12];
+static const int num_ticks = sizeof(tick_positions)/sizeof(tick_positions[0]);
+
+
+static void init_tick_positions(Layer *layer) {
+	GRect bounds = layer_get_bounds(layer);
+	GRect insetRect = grect_inset(bounds, GEdgeInsets(RING_INSET));
+	for (int i=0; i<num_ticks; i++) {
+		int hour_angle = DEG_TO_TRIGANGLE(i*360/num_ticks);
+
+		#if defined(PBL_ROUND)
+		tick_positions[i] = gpoint_from_polar(insetRect, GOvalScaleModeFitCircle, hour_angle);
+		#elif defined(PBL_RECT)
+		tick_positions[i] = get_point_at_rect_perim(hour_angle, insetRect);
+		#endif
+	}
+}
 
 static void ticks_update_proc(Layer *layer, GContext *ctx) {
-	GRect bounds = layer_get_bounds(layer);
-
 	graphics_context_set_stroke_width(ctx, 3);
 	graphics_context_set_stroke_color(ctx, ticks_colour);
 
-	for (int i=0; i<12; i++) {
-		int hour_angle = DEG_TO_TRIGANGLE(i*360/12);
-		GPoint pos = gpoint_from_polar(grect_inset(bounds, GEdgeInsets(RING_INSET)), GOvalScaleModeFitCircle, hour_angle);
+	for (int i=0; i<num_ticks; i++) {
+		GPoint pos = tick_positions[i];
 
-		if (!battery_gauge_enabled || i < battery_state.charge_percent*0.01*12) {
+		if (!battery_gauge_enabled || i < battery_state.charge_percent*0.01*num_ticks) {
 			graphics_context_set_fill_color(ctx, ticks_colour);
 			graphics_fill_circle(ctx, pos, ticks_size);
 		} else {
@@ -55,23 +68,35 @@ static void init_text_style(TextLayer *layer) {
 	text_layer_set_background_color(layer, GColorClear);
 	text_layer_set_font(layer, custom_font);
 	text_layer_set_text_alignment(layer, GTextAlignmentCenter);
+	#if defined(PBL_RECT)
+	text_layer_set_text_alignment(layer, GTextAlignmentLeft);
+	#endif
 }
 
 // adjust date position to avoid overlapping with big digit for hour
 static void update_date_group_position(unsigned short hour) {
-	GRect bounds = layer_get_bounds(window_layer);
 	GRect frame = layer_get_frame(date_group_layer);
 
+	#if defined(PBL_ROUND)
+	GRect bounds = layer_get_bounds(window_layer);
 	int center = bounds.size.w / 2;
 	int left = center/2 - frame.size.w/2;
 
 	if (hour >= 20) {
-		frame.origin.x = 5;
+		frame.origin.x = left - 10;
 	} else if (hour >= 10) {
 		frame.origin.x = left - 8;
 	} else {
 		frame.origin.x = left;
 	}
+	#elif defined(PBL_RECT)
+	if (hour >= 10) {
+		frame.origin.x = 5;
+	} else {
+		frame.origin.x = 15;
+	}
+	#endif
+
 	layer_set_frame(date_group_layer, frame);
 }
 
@@ -112,6 +137,7 @@ void load_window(Window *window) {
 
 	// create ticks
 	ticks_canvas = layer_create(bounds);
+	init_tick_positions(ticks_canvas);
 	layer_set_update_proc(ticks_canvas, ticks_update_proc);
 
 	// create big digits
@@ -145,12 +171,10 @@ void update_style() {
 	ticks_size = enamel_get_TICKS_SIZE();
 
 	battery_gauge_enabled = enamel_get_BATTERY_GAUGE_ENABLED();
-	temp_enabled = enamel_get_TEMP_ENABLED();
+	enable_temp(enamel_get_TEMP_ENABLED());
 	check_temp_unit_change();
 	set_temp_range_colour(enamel_get_TEMP_RANGE_COLOUR());
 	set_temp_now_colour(enamel_get_TEMP_NOW_COLOUR());
-	layer_set_hidden(temp_range_layer, !temp_enabled);
-	layer_set_hidden(temp_now_layer, !temp_enabled);
 	
 	layer_mark_dirty(hands_layer);
 	layer_mark_dirty(ticks_canvas);
@@ -190,6 +214,34 @@ void handle_battery_update(BatteryChargeState charge_state) {
 
 GColor get_bg_colour() {
 	return bg_colour;
+}
+
+GPoint get_point_at_rect_perim(int angle, GRect frame) {
+	int8_t topBottomSign = cos_lookup(angle)/abs(cos_lookup(angle));
+	int8_t leftRightSign = sin_lookup(angle)/abs(sin_lookup(angle));
+	GPoint center = GPoint(frame.origin.x + frame.size.w/2, frame.origin.y + frame.size.h/2);
+	int16_t xBound = center.x + leftRightSign*frame.size.w/2;
+	int16_t yBound = center.y - topBottomSign*frame.size.h/2;
+
+	// cornerAngle: angle between top right corner and top center
+	// Get complement since atan2 is measured anticlockwise from +x axis, 
+	// while pebble angles are measured clockwise from +y axis
+	int32_t cornerAngle = TRIG_MAX_ANGLE/4 - atan2_lookup(frame.size.h, frame.size.w);
+	angle = (angle + TRIG_MAX_ANGLE) % TRIG_MAX_ANGLE; // normalise angle
+	int topRightAngle = cornerAngle;
+	int topLeftAngle = TRIG_MAX_ANGLE - cornerAngle;
+	int bottomRightAngle = TRIG_MAX_ANGLE/2 - cornerAngle;
+	int bottomLeftAngle = TRIG_MAX_ANGLE/2 + cornerAngle;
+	bool isTopEdge = angle < topRightAngle || angle > topLeftAngle;
+	bool isBottomEdge = angle > bottomRightAngle && angle < bottomLeftAngle;
+
+	if (isTopEdge || isBottomEdge) {
+		// top or bottom edges
+		return GPoint(center.x + topBottomSign*(frame.size.h/2)*sin_lookup(angle)/cos_lookup(angle), yBound);
+	} else {
+		// left or right edges
+		return GPoint(xBound, center.y - leftRightSign*(frame.size.w/2)*cos_lookup(angle)/sin_lookup(angle));
+	}
 }
 
 void destroy_layers() {

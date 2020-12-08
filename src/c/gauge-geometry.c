@@ -88,10 +88,13 @@ static void debug_cycle_dates() {
 }
 
 static void handle_test(struct tm *tick_time, TimeUnits units_changed) {
-	update_time((tick_time->tm_sec+17)%24, tick_time->tm_sec%60);
+	update_time((tick_time->tm_min+tick_time->tm_sec)%24, tick_time->tm_sec%60);
 	update_date_month("30 May");
-	update_temp_range(20, 25);
-	update_temp_now(22);
+	enable_temp(true);
+	int temp_min = rand() % 30 - 20;
+	int temp_max = rand() % 50 + temp_min;
+	update_temp_range(temp_min, temp_max);
+	update_temp_now(tick_time->tm_sec-20);
 	debug_cycle_dates();
 }
 #endif

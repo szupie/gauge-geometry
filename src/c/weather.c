@@ -46,11 +46,14 @@ static void temp_now_update_proc(Layer *layer, GContext *ctx) {
 	if (temp_now_defined && temp_now_colour_defined) {
 		GRect bounds = layer_get_bounds(layer);
 		int temp_angle = degree_to_rad(temp_now);
+		GRect insetRect = grect_inset(bounds, GEdgeInsets(RING_INSET));
 
-		// graphics_context_set_fill_color(ctx, GColorDarkCandyAppleRed);
-		// graphics_fill_radial(ctx, bounds, GOvalScaleModeFitCircle, RING_INSET*2, temp_angle, temp_angle);
+		#if defined(PBL_ROUND)
+		GPoint pos = gpoint_from_polar(insetRect, GOvalScaleModeFitCircle, temp_angle);
+		#elif defined(PBL_RECT)
+		GPoint pos = get_point_at_rect_perim(temp_angle, insetRect);
+		#endif
 
-		GPoint pos = gpoint_from_polar(grect_inset(bounds, GEdgeInsets(RING_INSET)), GOvalScaleModeFitCircle, temp_angle);
 		graphics_context_set_fill_color(ctx, get_bg_colour());
 		graphics_context_set_stroke_color(ctx, temp_now_colour);
 		graphics_context_set_stroke_width(ctx, TEMP_NOW_STROKE);
@@ -59,11 +62,64 @@ static void temp_now_update_proc(Layer *layer, GContext *ctx) {
 	}
 }
 
+static void fill_rect_gauge(GContext *ctx, GRect bounds, int thickness, GPoint start, GPoint end) {
+	// fill gauge from start clockwise to next corner until end is reached
+	int loop_counter = 0;
+	while (!gpoint_equal(&start, &end)) {
+		GPoint nextPoint;
+		if (start.x == bounds.origin.x && start.y > bounds.origin.y) {
+			// upwards along left edge
+			nextPoint = bounds.origin;
+			if (end.x == start.x) {
+				nextPoint = end;
+			}
+			graphics_fill_rect(ctx, GRect(nextPoint.x, nextPoint.y, thickness, start.y - nextPoint.y), 0, GCornerNone);
+		}
+		if (start.y == bounds.origin.y && start.x < bounds.origin.x+bounds.size.w) {
+			// rightwards along top edge
+			nextPoint = GPoint(bounds.origin.x+bounds.size.w, bounds.origin.y);
+			if (end.y == start.y) {
+				nextPoint = end;
+			}
+			graphics_fill_rect(ctx, GRect(start.x, start.y, nextPoint.x - start.x, thickness), 0, GCornerNone);
+		}
+		if (start.x == bounds.origin.x+bounds.size.w && start.y < bounds.origin.y+bounds.size.h) {
+			// downwards along right edge
+			nextPoint = GPoint(bounds.origin.x+bounds.size.w, bounds.origin.y+bounds.size.h);
+			if (end.x == start.x) {
+				nextPoint = end;
+			}
+			graphics_fill_rect(ctx, GRect(start.x - thickness, start.y, thickness, nextPoint.y - start.y), 0, GCornerNone);
+		}
+		if (start.y == bounds.origin.y+bounds.size.h && start.x > bounds.origin.x) {
+			// leftwards along bottom edge
+			nextPoint = GPoint(bounds.origin.x, bounds.origin.y+bounds.size.h);
+			if (end.y == start.y) {
+				nextPoint = end;
+			}
+			graphics_fill_rect(ctx, GRect(nextPoint.x, nextPoint.y - thickness, start.x - nextPoint.x, thickness), 0, GCornerNone);
+		}
+		start = nextPoint; // set start to next corner
+
+		if (loop_counter++ > 8) {
+			APP_LOG(APP_LOG_LEVEL_WARNING, "Error: Temperature range draw loop unexpectedly long");
+			break;
+		}
+	}
+}
+
 static void temp_range_update_proc(Layer *layer, GContext *ctx) {
-	if (temp_range_defined && temp_range_colour_defined) {
+	if (temp_range_defined && temp_range_colour_defined && temp_min < temp_max) {
 		GRect bounds = layer_get_bounds(layer);
 		graphics_context_set_fill_color(ctx, temp_range_colour);
+
+		#if defined(PBL_ROUND)
 		graphics_fill_radial(ctx, bounds, GOvalScaleModeFitCircle, TEMP_RANGE_WIDTH, degree_to_rad(temp_min), degree_to_rad(temp_max));
+		#elif defined(PBL_RECT)
+		GPoint start = get_point_at_rect_perim(degree_to_rad(temp_min), bounds);
+		GPoint end = get_point_at_rect_perim(degree_to_rad(temp_max), bounds);
+		fill_rect_gauge(ctx, bounds, TEMP_RANGE_WIDTH, start, end);
+		#endif
 	}
 }
 
@@ -131,6 +187,13 @@ void update_temp_now(int now) {
 	temp_now = now;
 	temp_now_defined = true;
 	layer_mark_dirty(temp_now_layer);
+}
+
+void enable_temp(bool enabled) {
+	if (layer_get_hidden(temp_now_layer) != !enabled) {
+		layer_set_hidden(temp_range_layer, !enabled);
+		layer_set_hidden(temp_now_layer, !enabled);
+	}
 }
 
 void handle_weather_update(DictionaryIterator *iterator, void *context) {
