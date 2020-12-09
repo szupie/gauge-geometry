@@ -10,6 +10,7 @@ static Window *main_window;
 static EventHandle settings_updated_handle;
 
 // #define DEBUGGING_TIME
+// #define DEMO_MODE
 
 
 static unsigned short get_display_hour(unsigned short hour) {
@@ -103,12 +104,25 @@ static void handle_test(struct tm *tick_time, TimeUnits units_changed) {
 static void main_window_load(Window *window) {
 	load_window(window);
 
+	#ifndef DEMO_MODE
 	battery_state_service_subscribe(handle_battery_update);
 	handle_battery_update(battery_state_service_peek());
 
 	tick_timer_service_subscribe(MINUTE_UNIT, handle_minute_tick);
 
 	refresh_date_time();
+	#else
+	// static display in demo mode
+	update_time(10, 8);
+	update_day_of_week("Fri");
+	update_date_month("11 Nov");
+
+	handle_battery_update((BatteryChargeState){70, false, false});
+
+	enable_temp(true);
+	update_temp_range(15, 25);
+	update_temp_now(18);
+	#endif
 
 	settings_updated_handle = enamel_settings_received_subscribe(handle_settings_received, NULL);
 
