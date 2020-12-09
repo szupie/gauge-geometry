@@ -81,16 +81,18 @@ module.exports = function(minified) {
 		});
 
 		// Style subsection headings
-		$('.component-heading:not(:first-child)').each(item => {
-			$(item).set('$paddingBottom', '0.5rem');
-			$('h6', item).set({
-				$color: '#a4a4a4',
-				$textTransform: 'uppercase'
-			});
-		});
-		$(':not(.component-heading) + .component-heading').each(item => {
-			$('h6', item).set('$marginTop', '2rem');
-		});
+		$('#config-style').add(`
+			.component-heading:not(:first-child) {
+				padding-bottom: 0.5rem;
+			}
+			.component-heading:not(:first-child) h6 { 
+				color: #a4a4a4; 
+				text-transform: uppercase;
+			}
+			:not(.component-heading) + .component-heading h6 {
+				margin-top: 2rem;
+			}
+		`);
 
 		// Weather request can only be triggered on save, 
 		// so make button toggle hidden setting that gets reset every time
@@ -126,60 +128,79 @@ module.exports = function(minified) {
 			$justifyContent: 'center',
 			$alignItems: 'center'
 		});
-		$('#temp_dial').set({
-			$height: `${dialDiameter}rem`,
-			$width: `${dialDiameter}rem`,
-			$backgroundColor: '#666',
-			$borderRadius: '100%',
-			$position: 'relative'
-		});
-		
-		$('#temp_dial .indicator.current').set({
-			$height: `${currentIndicatorDiameter}px`,
-			$width: `${currentIndicatorDiameter}px`,
-			$backgroundColor: '#666',
-			$border: `4px solid transparent`,
-			$borderRadius: '100%',
-			$position: 'absolute',
-			$left: `calc(50% - ${currentIndicatorDiameter/2}px)`,
-			$marginTop: '-2px',
-			$transformOrigin: `${currentIndicatorDiameter/2}px calc(${dialDiameter/2}rem + 2px)`,
-			$zIndex: '1'
-		});
-		$('#temp_dial .indicator.range').set({
-			$height: `${dialDiameter}rem`,
-			$width: `${dialDiameter}rem`,
-			$borderWidth: '6px',
-			$borderStyle: 'solid',
-			$borderRadius: '100%',
-			$position: 'absolute',
-			$clipPath: 'polygon(50% 0, 50% 50%, 136% 0)'
-		});
-	
-		$('#temp_sample').set({
-			$marginLeft: '0.75rem',
-			$fontSize: '0.75rem',
-			$lineHeight: '1.5em',
-			$opacity: '0.6'
-		});
-		$('#temp_sample h6').set({
-			$textTransform: 'uppercase',
-			$lineHeight: 'inherit'
-		});
-		$('#temp_explain').set({
-			$flex: '1 0 100%',
-			$marginTop: '1rem'
-		});
+
+		$('#config-style').add(`
+			#temp_dial {
+				height: ${dialDiameter}rem;
+				width: ${dialDiameter}rem;
+				background-color: #666;
+				border-radius: 100%;
+				position: relative;
+			}
+			#temp_dial .indicator.current {
+				height: ${currentIndicatorDiameter}px;
+				width: ${currentIndicatorDiameter}px;
+				background-color: #666;
+				border: 4px solid transparent;
+				border-radius: 100%;
+				position: absolute;
+				left: calc(50% - ${currentIndicatorDiameter/2}px);
+				margin-top: -2px;
+				transform-origin: ${currentIndicatorDiameter/2}px calc(${dialDiameter/2}rem + 2px);
+				z-index: 1;
+			}
+			#temp_dial .indicator.range {
+				height: ${dialDiameter}rem;
+				width: ${dialDiameter}rem;
+				border-width: 6px;
+				border-style: solid;
+				border-radius: 100%;
+				position: absolute;
+				clip-path: polygon(50% 0, 50% 50%, 136% 0);
+			}
+			#temp_dial .markers .tick {
+				position: absolute;
+				padding-top: 0.1em;
+				height: ${dialDiameter}rem;
+				width: 1px;
+				left: calc(50% + 2px - ${markerThickness}px / 2);
+				border-top: ${markerThickness}px solid currentcolor;
+				opacity: 0.8;
+				font-size: 0.75rem;
+				z-index: 2;
+			}
+			#temp_dial .markers .tick .label {
+				display: inline-block;
+				margin: auto;
+			}
+			#temp_sample {
+				margin-left: 0.75rem;
+				font-size: 0.75rem;
+				line-height: 1.5em;
+				opacity: 0.6;
+			}
+			#temp_sample h6 {
+				text-transform: uppercase;
+				line-height: inherit;
+			}
+			#temp_explain {
+				flex: 1 0 100%;
+				margin-top: 1rem;
+			}
+		`);
 
 		function numToHexColour(num) {
-			return '#'+num.toString(16).padStart(6, "0");
+			return num.toString(16).padStart(6, "0");
+		}
+		function colourCorrect(colour) {
+			return sunlightColorMap[colour];
 		}
 		function updateTempCurrentColour() {
-			const currentColour = numToHexColour(tempCurrentColourInput.get());
+			const currentColour = '#'+colourCorrect(numToHexColour(tempCurrentColourInput.get()));
 			$('#temp_dial .indicator.current').set('$borderColor', currentColour);
 		}
 		function updateTempRangColour() {
-			const rangeColour = numToHexColour(tempRangeColourInput.get());
+			const rangeColour = '#'+colourCorrect(numToHexColour(tempRangeColourInput.get()));
 			$('#temp_dial .indicator.range').set('$borderColor', rangeColour);
 		}
 		updateTempCurrentColour();
@@ -212,29 +233,14 @@ module.exports = function(minified) {
 				let degree = i*scaleMultiplier;
 				if (tempUnit === 'c') degree -= 15;
 				const angle = degree*angleMultiplier;
-				const item = HTML("<div class='label'></div>");
+				const item = HTML("<div class='tick'></div>");
 				if ((tempUnit === 'c' && (degree % 15 == 0 || degree == -5) && degree > -15) ||
 					(tempUnit === 'f' && degree % 30 == 0)) {
 					$(item).add(HTML(`<span class="label">${degree}°</span>`));
 				}
 				$('#temp_dial .markers').add(item);
-				$(item).set({
-					$position: 'absolute',
-					$paddingTop: '0.1em',
-					$height: `${dialDiameter}rem`,
-					$width: '1px',
-					$left: `calc(50% + 2px - ${markerThickness}px / 2)`,
-					$transform: `rotate(${angle}deg)`,
-					$borderTop: `${markerThickness}px solid currentcolor`,
-					$opacity: '0.8',
-					$fontSize: '0.75rem',
-					$zIndex: '2'
-				});
-				$('.label', item).set({
-					$display: 'inline-block',
-					$margin: 'auto',
-					$transform: `translateX(-50%) rotate(${-angle}deg)`
-				});
+				$(item).set('$transform', `rotate(${angle}deg)`);
+				$('.label', item).set('$transform', `translateX(-50%) rotate(${-angle}deg)`);
 			};
 			$('#temp_dial .indicator.current').set('$transform', `rotate(${indicatorRotation + 30}deg)`);
 			$('#temp_dial .indicator.range').set('$transform', `rotate(${indicatorRotation}deg)`);
