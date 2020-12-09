@@ -14,7 +14,7 @@ static const GPathInfo HOUR_HAND_POINTS = {
 	4, (GPoint []){
 		{0, HOUR_HAND_THICKNESS},
 		{-HOUR_HAND_THICKNESS, 0},
-		{0, -56},
+		{0, -46},
 		{HOUR_HAND_THICKNESS, 0}
 	}
 };

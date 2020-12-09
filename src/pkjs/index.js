@@ -210,6 +210,9 @@ Pebble.addEventListener('ready',
 			weatherProvider = localStorageSettings['WEATHER_PROVIDER'];
 			weatherAPIKey = localStorageSettings['WEATHER_API_KEY'];
 		}
+		// Uncomment next line and listen to logs on phone to get a copy of
+		// the html code of the config page for debugging
+		// console.log(clay.generateUrl());
 	}
 );
 

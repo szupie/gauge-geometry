@@ -9,6 +9,21 @@
 		"items": [
 			{
 				"type": "heading",
+				"id": "themes-accordion",
+				"defaultValue": "<span class='accordion-label'>Preset themes</span>",
+				"size": 4
+			},
+			{
+				"type": "text",
+				"defaultValue": "<section id='presetThemes'><button data-theme-id='classic'>Classic</button><button data-theme-id='nautical'>Nautical</button><button data-theme-id='gold'>Gold</button><button data-theme-id='rose'>Rose</button><button data-theme-id='purple'>Purple</button><button data-theme-id='red'>Red</button><button data-theme-id='black'>Black</button><button data-theme-id='platinum'>Platinum</button></section>"
+			}
+		]
+	},
+	{
+		"type": "section",
+		"items": [
+			{
+				"type": "heading",
 				"defaultValue": "Time and date"
 			},
 			{
