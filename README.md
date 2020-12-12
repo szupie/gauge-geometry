@@ -5,6 +5,9 @@ An analog-digital Pebble watch face designed for legibility and simplicity
 
 Large digits and analog hands make it easy to read the time at a glance from more angles. The watch face also displays day/date, temperature, and battery level. Colours are customisable from the settings page.
 
+## Installation
+Get it from the [Rebble appstore](https://apps.rebble.io/en_US/application/5fd419293dd3100155d398b8).
+
 ## Building
 To build this project, you’ll need the Pebble SDK installed ([setup guide](https://github.com/andb3/pebble-setup)). Then run `pebble build`, and 
 `pebble install --emulator [basalt, chalk]` or `pebble install --phone phone_ip` to run on the emulator or a Pebble.
