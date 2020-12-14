@@ -53,7 +53,7 @@
 					"type": "font",
 					"name": "POPPINS_16",
 					"file": "Poppins-SemiBold.ttf",
-					"characterRegex": "[A-Za-z0-9 ]"
+					"characterRegex": "[A-Za-záäéû0-9 ]"
 				},
 				{
 					"type": "bitmap",

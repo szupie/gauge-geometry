@@ -31,13 +31,22 @@ static void display_time(struct tm *tick_time) {
 }
 
 static void display_date(struct tm *tick_time) {
-	static char day_buffer[8], date_buffer[8];
-	strftime(day_buffer, sizeof("ddd"), "%a", tick_time);
+	static char day_buffer[5], date_buffer[10];
+	strftime(day_buffer, 5, "%a", tick_time);
 	update_day_of_week(day_buffer);
 
-	strftime(date_buffer, sizeof("dd mmm"), "%e %b", tick_time);
+	strftime(date_buffer, 10, "%e %b", tick_time);
 	char *date_trimmed = date_buffer;
+
+	// trim initial space
 	if (date_trimmed[0] == ' ') date_trimmed++;
+
+	// trim final "."
+	int date_length = strlen(date_trimmed);
+	if (date_trimmed[date_length-1] == '.') {
+		date_trimmed[date_length-1] = '\0';
+	}
+
 	update_date_month(date_trimmed);
 }
 
@@ -78,30 +87,31 @@ static void handle_settings_received(void *context) {
 static time_t debug_now;
 static struct tm *debug_time;
 static void debug_cycle_dates() {
+	debug_time->tm_wday = debug_time->tm_sec%7;
 	debug_time->tm_mday = debug_time->tm_mday%31+1;
-	debug_time->tm_mon = debug_time->tm_sec%12+1;
+	debug_time->tm_mon = debug_time->tm_sec%12;
 
-	static char date_buffer[8];
-	strftime(date_buffer, sizeof("dd mmm"), "%e %b", debug_time);
-	char *date_trimmed = date_buffer;
-	if (date_trimmed[0] == ' ') date_trimmed++;
-	update_date_month(date_trimmed);
+	display_date(debug_time);
 }
 
 static void handle_test(struct tm *tick_time, TimeUnits units_changed) {
 	update_time((tick_time->tm_min+tick_time->tm_sec)%24, tick_time->tm_sec%60);
-	update_date_month("30 May");
+
 	enable_temp(true);
 	int temp_min = rand() % 30 - 20;
 	int temp_max = rand() % 50 + temp_min;
 	update_temp_range(temp_min, temp_max);
 	update_temp_now(tick_time->tm_sec-20);
+
+	debug_now = time(NULL);
+	debug_time = localtime(&debug_now);
 	debug_cycle_dates();
 }
 #endif
 
 
 static void main_window_load(Window *window) {
+	setlocale(LC_ALL, ""); // use locale set by user in phone app
 	load_window(window);
 
 	#ifndef DEMO_MODE

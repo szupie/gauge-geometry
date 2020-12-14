@@ -107,7 +107,7 @@ void load_window(Window *window) {
 	// create day of week and date text layers
 	int line_height = 16;
 	int bottom = bounds.size.h / 2 - 3;
-	int width = 60;
+	int width = 80;
 
 	date_group_layer = layer_create(GRect(0, bottom - (line_height*2), width, line_height*3));
 
