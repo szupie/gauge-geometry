@@ -1,8 +1,13 @@
 #pragma once
 #include <pebble.h>
 
+#if defined(PBL_ROUND)
 #define RING_INSET 8
 #define TEMP_RANGE_WIDTH 12
+#elif defined(PBL_RECT)
+#define RING_INSET 4
+#define TEMP_RANGE_WIDTH 8
+#endif
 #define TEMP_NOW_RADIUS 6
 #define TEMP_NOW_STROKE 6
 #define TEXT_SHADOW_OFFSET 1

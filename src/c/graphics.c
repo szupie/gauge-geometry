@@ -91,7 +91,7 @@ static void update_date_group_position(unsigned short hour) {
 	}
 	#elif defined(PBL_RECT)
 	if (hour >= 10) {
-		frame.origin.x = 5;
+		frame.origin.x = 8;
 	} else {
 		frame.origin.x = 15;
 	}
@@ -108,15 +108,20 @@ void load_window(Window *window) {
 	int line_height = 16;
 	int bottom = bounds.size.h / 2 - 3;
 	int width = 80;
+	#if defined(PBL_ROUND)
+	int top = bottom - (line_height*2);
+	#elif defined(PBL_RECT)
+	int top = bottom - (line_height*3);
+	#endif
 
-	date_group_layer = layer_create(GRect(0, bottom - (line_height*2), width, line_height*3));
+	date_group_layer = layer_create(GRect(0, top, width, line_height*3.5));
 
 	day_text_layer = text_layer_create(GRect(0, 0, width, line_height*1.5));
 	day_shadow_text_layer = text_layer_create(GRect(TEXT_SHADOW_OFFSET, TEXT_SHADOW_OFFSET, width, line_height*1.5));
 
-	date_text_layer = text_layer_create(GRect(0, line_height, width, line_height*1.5));
-	date_shadow_text_layer_a = text_layer_create(GRect(TEXT_SHADOW_OFFSET, line_height + TEXT_SHADOW_OFFSET, width, line_height*1.5));
-	date_shadow_text_layer_b = text_layer_create(GRect(TEXT_SHADOW_OFFSET, line_height - TEXT_SHADOW_OFFSET, width, line_height*1.5));
+	date_text_layer = text_layer_create(GRect(0, line_height, width, line_height*2.5));
+	date_shadow_text_layer_a = text_layer_create(GRect(TEXT_SHADOW_OFFSET, line_height + TEXT_SHADOW_OFFSET, width, line_height*2.5));
+	date_shadow_text_layer_b = text_layer_create(GRect(TEXT_SHADOW_OFFSET, line_height - TEXT_SHADOW_OFFSET, width, line_height*2.5));
 
 	init_text_style(day_text_layer);
 	init_text_style(day_shadow_text_layer);

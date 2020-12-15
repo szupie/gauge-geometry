@@ -35,7 +35,13 @@ static void display_date(struct tm *tick_time) {
 	strftime(day_buffer, 5, "%a", tick_time);
 	update_day_of_week(day_buffer);
 
-	strftime(date_buffer, 10, "%e %b", tick_time);
+	#if defined(PBL_ROUND)
+	char date_format[] = "%e %b";
+	#elif defined(PBL_RECT)
+	char date_format[] = "%e\n%b";
+	#endif
+
+	strftime(date_buffer, 10, date_format, tick_time);
 	char *date_trimmed = date_buffer;
 
 	// trim initial space
