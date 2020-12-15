@@ -5,7 +5,7 @@ module.exports = function(minified) {
 	var HTML = minified.HTML;
 
 	clayConfig.on(clayConfig.EVENTS.AFTER_BUILD, function() {
-		$('head').add(HTML(`<style type="text/css" id="config-style"></style>`));
+		$('head').add(HTML('<style type="text/css" id="config-style"></style>'));
 
 		clayConfig.getItemById('save-button').$element.set({
 			$position: 'sticky',
@@ -15,60 +15,60 @@ module.exports = function(minified) {
 		});
 
 		// Themes
-		$('#config-style').add(`
-			#presetThemes {
-				text-align: center;
-			}
-			.accordion:not(.shown) + .component {
-				max-height: 3rem;
-			}
-			.accordion + .component::before {
-				content: '';
-				position: absolute;
-				top: 0;
-				bottom: 0;
-				left: 0;
-				right: 0;
-				background: linear-gradient(rgba(72, 72, 72, 0), rgba(72, 72, 72, 1));
-				transition: opacity ease-out 200ms;
-			}
-			.accordion.shown + .component::before {
-				pointer-events: none;
-				opacity: 0;
-			}
-			.accordion + .component {
-				overflow: hidden;
-				max-height: 100vh;
-				transition-property: max-height, padding-top, padding-bottom;
-				transition-timing-function: ease-out;
-				transition-duration: 200ms;
-			}
-			.accordion-label::after {
-				content: '▾';
-				margin-left: 0.5rem;
-				display: inline-block;
-				transition: transform ease-out 200ms;
-			}
-			.accordion.shown .accordion-label::after {
-				transform: translateY(-10%) rotate(-180deg);
-			}
-			#presetThemes [data-theme-id] {
-				min-width: 0;
-				width: 5em;
-				margin-left: 0.5em;
-				margin-right: 0.5em;
-				padding: 0;
-				background: none;
-				font-size: .8rem;
-				color: #a4a4a4; 
-			}
-			#presetThemes [data-theme-id] img {
-				max-width: 100%;
-				margin-top: 0.2rem;	
-				box-shadow: 0 0 0 2pt #414141;
-				border-radius: 50%;
-			}
-		`);
+		$('#config-style').add(
+			'#presetThemes {'+
+				'text-align: center;'+
+			'}'+
+			'.accordion:not(.shown) + .component {'+
+				'max-height: 3rem;'+
+			'}'+
+			'.accordion + .component::before {'+
+				'content: "";'+
+				'position: absolute;'+
+				'top: 0;'+
+				'bottom: 0;'+
+				'left: 0;'+
+				'right: 0;'+
+				'background: linear-gradient(rgba(72, 72, 72, 0), rgba(72, 72, 72, 1));'+
+				'transition: opacity ease-out 200ms;'+
+			'}'+
+			'.accordion.shown + .component::before {'+
+				'pointer-events: none;'+
+				'opacity: 0;'+
+			'}'+
+			'.accordion + .component {'+
+				'overflow: hidden;'+
+				'max-height: 100vh;'+
+				'transition-property: max-height, padding-top, padding-bottom;'+
+				'transition-timing-function: ease-out;'+
+				'transition-duration: 200ms;'+
+			'}'+
+			'.accordion-label::after {'+
+				'content: "▾";'+
+				'margin-left: 0.5rem;'+
+				'display: inline-block;'+
+				'transition: transform ease-out 200ms;'+
+			'}'+
+			'.accordion.shown .accordion-label::after {'+
+				'transform: translateY(-10%) rotate(-180deg);'+
+			'}'+
+			'#presetThemes [data-theme-id] {'+
+				'min-width: 0;'+
+				'width: 5em;'+
+				'margin-left: 0.5em;'+
+				'margin-right: 0.5em;'+
+				'padding: 0;'+
+				'background: none;'+
+				'font-size: .8rem;'+
+				'color: #a4a4a4; '+
+			'}'+
+			'#presetThemes [data-theme-id] img {'+
+				'max-width: 100%;'+
+				'margin-top: 0.2rem;	'+
+				'box-shadow: 0 0 0 2pt #414141;'+
+				'border-radius: 50%;'+
+			'}'
+		);
 		const themesAccordion = clayConfig.getItemById('themes-accordion').$element;
 		themesAccordion[0].classList.add('accordion')
 		function toggleThemeAccordion() {
@@ -76,10 +76,10 @@ module.exports = function(minified) {
 		}
 		themesAccordion.on('click', toggleThemeAccordion);
 		$(themesAccordion[0].nextSibling).on('click', toggleThemeAccordion);
-		$('[data-theme-id]').each(item => {
+		$('[data-theme-id]').each(function (item) {
 			const themeId = item.getAttribute('data-theme-id');
-			$(item).add(HTML(`<img src='${screenshots[themeId]}'/>`));
-			$(item).on('click', ()=>{
+			$(item).add(HTML('<img src="'+screenshots[themeId]+'"/>'));
+			$(item).on('click', function () {
 				applyThemeSettings(themeSettings[themeId]);
 			});
 		});
@@ -88,25 +88,25 @@ module.exports = function(minified) {
 		const ticksSizeInput = $('input.slider', clayConfig.getItemByMessageKey('TICKS_SIZE').$element);
 		const sliderCount = ticksSizeInput.get('@max');
 		ticksSizeInput.set({
-			$background: `repeating-linear-gradient(to right, #666, #666 1px, transparent 1px, transparent calc(100% / ${sliderCount} - 1px), #666 calc(100% / ${sliderCount} - 1px), #666 calc(100% / ${sliderCount}))`,
+			$background: 'repeating-linear-gradient(to right, #666, #666 1px, transparent 1px, transparent calc(100% / '+sliderCount+' - 1px), #666 calc(100% / '+sliderCount+' - 1px), #666 calc(100% / '+sliderCount+'))',
 			$backgroundSize: 'calc(100% - 1.4rem) 0.75rem',
 			$backgroundPosition: 'center',
 			$backgroundRepeat: 'no-repeat'
 		});
 
 		// Style subsection headings
-		$('#config-style').add(`
-			.component-heading:not(:first-child) {
-				padding-bottom: 0.5rem;
-			}
-			.component-heading:not(:first-child) h6 { 
-				color: #a4a4a4; 
-				text-transform: uppercase;
-			}
-			:not(.component-heading) + .component-heading h6 {
-				margin-top: 2rem;
-			}
-		`);
+		$('#config-style').add(
+			'.component-heading:not(:first-child) {'+
+				'padding-bottom: 0.5rem;'+
+			'}'+
+			'.component-heading:not(:first-child) h6 { '+
+				'color: #a4a4a4; '+
+				'text-transform: uppercase;'+
+			'}'+
+			':not(.component-heading) + .component-heading h6 {'+
+				'margin-top: 2rem;'+
+			'}'
+		);
 
 		// Weather request can only be triggered on save, 
 		// so make button toggle hidden setting that gets reset every time
@@ -143,65 +143,65 @@ module.exports = function(minified) {
 			$alignItems: 'center'
 		});
 
-		$('#config-style').add(`
-			#temp_dial {
-				height: ${dialDiameter}rem;
-				width: ${dialDiameter}rem;
-				background-color: #666;
-				border-radius: 100%;
-				position: relative;
-			}
-			#temp_dial .indicator.current {
-				height: ${currentIndicatorDiameter}px;
-				width: ${currentIndicatorDiameter}px;
-				background-color: #666;
-				border: 4px solid transparent;
-				border-radius: 100%;
-				position: absolute;
-				left: calc(50% - ${currentIndicatorDiameter/2}px);
-				margin-top: -2px;
-				transform-origin: ${currentIndicatorDiameter/2}px calc(${dialDiameter/2}rem + 2px);
-				z-index: 1;
-			}
-			#temp_dial .indicator.range {
-				height: ${dialDiameter}rem;
-				width: ${dialDiameter}rem;
-				border-width: 6px;
-				border-style: solid;
-				border-radius: 100%;
-				position: absolute;
-				clip-path: polygon(50% 0, 50% 50%, 136% 0);
-			}
-			#temp_dial .markers .tick {
-				position: absolute;
-				padding-top: 0.1em;
-				height: ${dialDiameter}rem;
-				width: 1px;
-				left: calc(50% + 2px - ${markerThickness}px / 2);
-				border-top: ${markerThickness}px solid currentcolor;
-				opacity: 0.8;
-				font-size: 0.75rem;
-				z-index: 2;
-			}
-			#temp_dial .markers .tick .label {
-				display: inline-block;
-				margin: auto;
-			}
-			#temp_sample {
-				margin-left: 0.75rem;
-				font-size: 0.75rem;
-				line-height: 1.5em;
-				opacity: 0.6;
-			}
-			#temp_sample h6 {
-				text-transform: uppercase;
-				line-height: inherit;
-			}
-			#temp_explain {
-				flex: 1 0 100%;
-				margin-top: 1rem;
-			}
-		`);
+		$('#config-style').add(
+			'#temp_dial {'+
+				'height: '+dialDiameter+'rem;'+
+				'width: '+dialDiameter+'rem;'+
+				'background-color: #666;'+
+				'border-radius: 100%;'+
+				'position: relative;'+
+			'}'+
+			'#temp_dial .indicator.current {'+
+				'height: '+currentIndicatorDiameter+'px;'+
+				'width: '+currentIndicatorDiameter+'px;'+
+				'background-color: #666;'+
+				'border: 4px solid transparent;'+
+				'border-radius: 100%;'+
+				'position: absolute;'+
+				'left: calc(50% - '+currentIndicatorDiameter/2+'px);'+
+				'margin-top: -2px;'+
+				'transform-origin: '+currentIndicatorDiameter/2+'px calc('+dialDiameter/2+'rem + 2px);'+
+				'z-index: 1;'+
+			'}'+
+			'#temp_dial .indicator.range {'+
+				'height: '+dialDiameter+'rem;'+
+				'width: '+dialDiameter+'rem;'+
+				'border-width: 6px;'+
+				'border-style: solid;'+
+				'border-radius: 100%;'+
+				'position: absolute;'+
+				'clip-path: polygon(50% 0, 50% 50%, 136% 0);'+
+			'}'+
+			'#temp_dial .markers .tick {'+
+				'position: absolute;'+
+				'padding-top: 0.1em;'+
+				'height: '+dialDiameter+'rem;'+
+				'width: 1px;'+
+				'left: calc(50% + 2px - '+markerThickness+'px / 2);'+
+				'border-top: '+markerThickness+'px solid currentcolor;'+
+				'opacity: 0.8;'+
+				'font-size: 0.75rem;'+
+				'z-index: 2;'+
+			'}'+
+			'#temp_dial .markers .tick .label {'+
+				'display: inline-block;'+
+				'margin: auto;'+
+			'}'+
+			'#temp_sample {'+
+				'margin-left: 0.75rem;'+
+				'font-size: 0.75rem;'+
+				'line-height: 1.5em;'+
+				'opacity: 0.6;'+
+			'}'+
+			'#temp_sample h6 {'+
+				'text-transform: uppercase;'+
+				'line-height: inherit;'+
+			'}'+
+			'#temp_explain {'+
+				'flex: 1 0 100%;'+
+				'margin-top: 1rem;'+
+			'}'
+		);
 
 		function numToHexColour(num) {
 			return num.toString(16).padStart(6, "0");
@@ -224,7 +224,7 @@ module.exports = function(minified) {
 
 		function drawTempDial() {
 			const tempUnit = tempUnitInput.get();
-			let scaleMultiplier, angleMultiplier, indicatorRotation;
+			var scaleMultiplier, angleMultiplier, indicatorRotation;
 			if (tempUnit === 'c') {
 				scaleMultiplier = 5;
 				angleMultiplier = 6;
@@ -235,29 +235,29 @@ module.exports = function(minified) {
 				indicatorRotation = 180;
 			}
 			// extra $ marks necessary because they get dropped (escaped?)
-			$('.celsius', tempUnitInput.$element).each(item => {
+			$('.celsius', tempUnitInput.$element).each(function (item) {
 				$(item).set('$$$$show', tempUnit === 'c');
 			});
-			$('.fahrenheit', tempUnitInput.$element).each(item => {
+			$('.fahrenheit', tempUnitInput.$element).each(function (item) {
 				$(item).set('$$$$show', tempUnit === 'f');
 			});
 
 			$('#temp_dial .markers').set('innerHTML', '');
-			for (let i=0; i<12; i++) {
-				let degree = i*scaleMultiplier;
+			for (var i=0; i<12; i++) {
+				var degree = i*scaleMultiplier;
 				if (tempUnit === 'c') degree -= 15;
 				const angle = degree*angleMultiplier;
 				const item = HTML("<div class='tick'></div>");
 				if ((tempUnit === 'c' && (degree % 15 == 0 || degree == -5) && degree > -15) ||
 					(tempUnit === 'f' && degree % 30 == 0)) {
-					$(item).add(HTML(`<span class="label">${degree}°</span>`));
+					$(item).add(HTML('<span class="label">'+degree+'°</span>'));
 				}
 				$('#temp_dial .markers').add(item);
-				$(item).set('$transform', `rotate(${angle}deg)`);
-				$('.label', item).set('$transform', `translateX(-50%) rotate(${-angle}deg)`);
+				$(item).set('$transform', 'rotate('+angle+'deg)');
+				$('.label', item).set('$transform', 'translateX(-50%) rotate('+(-angle)+'deg)');
 			};
-			$('#temp_dial .indicator.current').set('$transform', `rotate(${indicatorRotation + 30}deg)`);
-			$('#temp_dial .indicator.range').set('$transform', `rotate(${indicatorRotation}deg)`);
+			$('#temp_dial .indicator.current').set('$transform', 'rotate('+(indicatorRotation + 30)+'deg)');
+			$('#temp_dial .indicator.range').set('$transform', 'rotate('+indicatorRotation+'deg)');
 		}
 		
 		tempUnitInput.on('change', function() {
@@ -274,12 +274,12 @@ module.exports = function(minified) {
 		function updateWeatherElements() {
 			if (weatherProviderInput.get() === "none") {
 				weatherEnabledToggle.set(false);
-				weatherElements.forEach(element => {
+				weatherElements.forEach(function (element) {
 					element.disable();
 				});
 			} else {
 				weatherEnabledToggle.set(true);
-				weatherElements.forEach(element => {
+				weatherElements.forEach(function (element) {
 					element.enable();
 				});
 			}
@@ -295,9 +295,9 @@ module.exports = function(minified) {
 
 
 	function applyThemeSettings(settings) {
-		for (const key in settings) {
+		Object.keys(settings).forEach(function (key) {
 			clayConfig.getItemByMessageKey(key).set(settings[key]);
-		}
+		});
 	};
 
 	// Preset colour schemes

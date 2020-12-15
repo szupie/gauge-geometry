@@ -3,14 +3,14 @@ const clayConfig = require('./config.json');
 const customClay = require('./custom-clay');
 const clay = new Clay(clayConfig, customClay);
 
-let tempEnabled;
-let tempUnits;
-let tempFeelsLike;
-let weatherProvider;
-let weatherAPIKey;
+var tempEnabled;
+var tempUnits;
+var tempFeelsLike;
+var weatherProvider;
+var weatherAPIKey;
 
 function xhrRequest(url) {
-	return new Promise((resolve, reject) => {
+	return new Promise(function (resolve, reject) {
 		const xhr = new XMLHttpRequest();
 		const type = "GET";
 		xhr.onload = function() { resolve(xhr.response); };
@@ -22,11 +22,11 @@ function xhrRequest(url) {
 
 function requestDarksky(lat, lon) {
 	const units = (tempUnits === 'c') ? 'si' : 'us';
-	const url = `https://api.darksky.net/forecast/${weatherAPIKey}/${lat},${lon}?units=${units}&exclude=minutely,hourly,alerts,flags`;
+	const url = 'https://api.darksky.net/forecast/'+weatherAPIKey+'/'+lat+','+lon+'?units='+units+'&exclude=minutely,hourly,alerts,flags';
 
-	return xhrRequest(url).then(responseText => {
+	return xhrRequest(url).then(function (responseText) {
 		const json = JSON.parse(responseText);
-		let now, min, max;
+		var now, min, max;
 		if (tempFeelsLike) {
 			now = json.currently.apparentTemperature;
 			min = json.daily.data[0].apparentTemperatureLow;
@@ -43,23 +43,23 @@ function requestDarksky(lat, lon) {
 function requestClimacell(lat, lon) {
 	const units = (tempUnits === 'c') ? 'si' : 'us';
 	const tempField = tempFeelsLike ? 'feels_like' : 'temp';
-	const query = `lat=${lat}&lon=${lon}&unit_system=${units}&fields=${tempField}&apikey=${weatherAPIKey}`;
+	const query = 'lat='+lat+'&lon='+lon+'&unit_system='+units+'&fields='+tempField+'&apikey='+weatherAPIKey;
 
-	const nowEndpoint = `https://api.climacell.co/v3/weather/realtime?${query}`;
-	const nowRequest = xhrRequest(nowEndpoint).then(responseText => {
+	const nowEndpoint = 'https://api.climacell.co/v3/weather/realtime?'+query;
+	const nowRequest = xhrRequest(nowEndpoint).then(function (responseText) {
 		const json = JSON.parse(responseText);
 		return json[tempField].value;
 	});
 
-	const dailyEndpoint = `https://api.climacell.co/v3/weather/forecast/daily?start_time=now&${query}`;
-	const dailyRequest = xhrRequest(dailyEndpoint).then(responseText => {
+	const dailyEndpoint = 'https://api.climacell.co/v3/weather/forecast/daily?start_time=now&'+query;
+	const dailyRequest = xhrRequest(dailyEndpoint).then(function (responseText) {
 		const json = JSON.parse(responseText);
 		const min = json[0][tempField][0].min.value;
 		const max = json[0][tempField][1].max.value;
 		return [min, max];
 	});
 
-	return Promise.all([nowRequest, dailyRequest]).then(results => {
+	return Promise.all([nowRequest, dailyRequest]).then(function (results) {
 		const now = results[0]
 		const minMax = results[1];
 		return [now, minMax[0], minMax[1]];
@@ -68,11 +68,11 @@ function requestClimacell(lat, lon) {
 
 function requestOwm(lat, lon) {
 	const units = (tempUnits === 'c') ? 'metric' : 'imperial';
-	const url = `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&units=${units}&appid=${weatherAPIKey}&exclude=hourly,minutely`;
+	const url = 'https://api.openweathermap.org/data/2.5/onecall?lat='+lat+'&lon='+lon+'&units='+units+'&appid='+weatherAPIKey+'&exclude=hourly,minutely';
 
-	return xhrRequest(url).then(responseText => {
+	return xhrRequest(url).then(function (responseText) {
 		const json = JSON.parse(responseText);
-		let now, min, max;
+		var now, min, max;
 		if (tempFeelsLike) {
 			now = json.current.feels_like;
 		} else {
@@ -86,10 +86,10 @@ function requestOwm(lat, lon) {
 
 function requestWeatherbit(lat, lon) {
 	const units = (tempUnits === 'c') ? 'M' : 'I';
-	const query = `lat=${lat}&lon=${lon}&units=${units}&key=${weatherAPIKey}`;
+	const query = 'lat='+lat+'&lon='+lon+'&units='+units+'&key='+weatherAPIKey;
 
-	const nowEndpoint = `https://api.weatherbit.io/v2.0/current?${query}`;
-	const nowRequest = xhrRequest(nowEndpoint).then(responseText => {
+	const nowEndpoint = 'https://api.weatherbit.io/v2.0/current?'+query;
+	const nowRequest = xhrRequest(nowEndpoint).then(function (responseText) {
 		const json = JSON.parse(responseText);
 		if (tempFeelsLike) {
 			return json.data[0].app_temp;
@@ -98,10 +98,10 @@ function requestWeatherbit(lat, lon) {
 		}
 	});
 
-	const dailyEndpoint = `https://api.weatherbit.io/v2.0/forecast/daily?days=1&${query}`;
-	const dailyRequest = xhrRequest(dailyEndpoint).then(responseText => {
+	const dailyEndpoint = 'https://api.weatherbit.io/v2.0/forecast/daily?days=1&'+query;
+	const dailyRequest = xhrRequest(dailyEndpoint).then(function (responseText) {
 		const json = JSON.parse(responseText);
-		let min, max;
+		var min, max;
 		if (tempFeelsLike) {
 			min = json.data[0].app_min_temp;
 			max = json.data[0].app_max_temp;
@@ -112,7 +112,7 @@ function requestWeatherbit(lat, lon) {
 		return [min, max];
 	});
 
-	return Promise.all([nowRequest, dailyRequest]).then(results => {
+	return Promise.all([nowRequest, dailyRequest]).then(function (results) {
 		const now = results[0]
 		const minMax = results[1];
 		return [now, minMax[0], minMax[1]];
@@ -124,7 +124,7 @@ function locationSuccess(pos) {
 	if (weatherAPIKey) {
 		const lat = pos.coords.latitude;
 		const lon = pos.coords.longitude;
-		let weatherPromise;
+		var weatherPromise;
 		switch (weatherProvider) {
 			case 'darksky':
 				weatherPromise = requestDarksky(lat, lon);
@@ -140,12 +140,12 @@ function locationSuccess(pos) {
 				break;
 		}
 
-		weatherPromise.then(nowMinMaxTuple => {
+		weatherPromise.then(function (nowMinMaxTuple) {
 
-			let now, min, max;
-			[now, min, max] = nowMinMaxTuple.map(val => Math.round(val));
+			var now, min, max;
+			[now, min, max] = nowMinMaxTuple.map(function (val) { return Math.round(val) });
 
-			console.log(`Current temp: ${now}; min: ${min}; max: ${max}`);
+			console.log('Current temp: '+now+'; min: '+min+'; max: '+max);
 
 			// Assemble dictionary using our keys
 			const dictionary = {
