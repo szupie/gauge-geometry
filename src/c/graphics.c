@@ -222,12 +222,6 @@ GColor get_bg_colour() {
 }
 
 GPoint get_point_at_rect_perim(int angle, GRect frame) {
-	int8_t topBottomSign = cos_lookup(angle)/abs(cos_lookup(angle));
-	int8_t leftRightSign = sin_lookup(angle)/abs(sin_lookup(angle));
-	GPoint center = GPoint(frame.origin.x + frame.size.w/2, frame.origin.y + frame.size.h/2);
-	int16_t xBound = center.x + leftRightSign*frame.size.w/2;
-	int16_t yBound = center.y - topBottomSign*frame.size.h/2;
-
 	// cornerAngle: angle between top right corner and top center
 	// Get complement since atan2 is measured anticlockwise from +x axis, 
 	// while pebble angles are measured clockwise from +y axis
@@ -240,12 +234,20 @@ GPoint get_point_at_rect_perim(int angle, GRect frame) {
 	bool isTopEdge = angle < topRightAngle || angle > topLeftAngle;
 	bool isBottomEdge = angle > bottomRightAngle && angle < bottomLeftAngle;
 
+	GPoint center = GPoint(frame.origin.x + frame.size.w/2, frame.origin.y + frame.size.h/2);
+
 	if (isTopEdge || isBottomEdge) {
 		// top or bottom edges
-		return GPoint(center.x + topBottomSign*(frame.size.h/2)*sin_lookup(angle)/cos_lookup(angle), yBound);
+		int8_t topBottomSign = cos_lookup(angle)/abs(cos_lookup(angle));
+		int16_t yEdge = center.y - topBottomSign*frame.size.h/2;
+
+		return GPoint(center.x + topBottomSign*(frame.size.h/2)*sin_lookup(angle)/cos_lookup(angle), yEdge);
 	} else {
 		// left or right edges
-		return GPoint(xBound, center.y - leftRightSign*(frame.size.w/2)*cos_lookup(angle)/sin_lookup(angle));
+		int8_t leftRightSign = sin_lookup(angle)/abs(sin_lookup(angle));
+		int16_t xEdge = center.x + leftRightSign*frame.size.w/2;
+
+		return GPoint(xEdge, center.y - leftRightSign*(frame.size.w/2)*cos_lookup(angle)/sin_lookup(angle));
 	}
 }
 
