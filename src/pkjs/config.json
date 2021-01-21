@@ -6,6 +6,7 @@
 	},
 	{
 		"type": "section",
+		"capabilities": ["COLOR"],
 		"items": [
 			{
 				"type": "heading",
@@ -28,15 +29,33 @@
 			},
 			{
 				"type": "color",
+				"capabilities": ["COLOR"],
 				"messageKey": "HOUR_HAND_COLOUR",
 				"defaultValue": "AA0000",
 				"label": "Hour hand"
 			},
 			{
 				"type": "color",
+				"capabilities": ["COLOR"],
 				"messageKey": "MINUTE_HAND_COLOUR",
 				"defaultValue": "0055FF",
 				"label": "Minute hand"
+			},
+			{
+				"type": "color",
+				"capabilities": ["BW"],
+				"messageKey": "HOUR_HAND_COLOUR",
+				"defaultValue": "AAAAAA",
+				"label": "Hour hand",
+				"allowGray": true
+			},
+			{
+				"type": "color",
+				"capabilities": ["BW"],
+				"messageKey": "MINUTE_HAND_COLOUR",
+				"defaultValue": "AAAAAA",
+				"label": "Minute hand",
+				"allowGray": true
 			},
 			{
 				"type": "color",
@@ -69,7 +88,8 @@
 				"type": "color",
 				"messageKey": "TICKS_COLOUR",
 				"defaultValue": "000055",
-				"label": "Colour"
+				"label": "Colour",
+				"allowGray": true
 			},
 			{
 				"type": "slider",
@@ -196,7 +216,8 @@
 				"messageKey": "TEMP_RANGE_COLOUR",
 				"defaultValue": "FF55AA",
 				"label": "Daily high/low temperature range",
-				"group": "weatherDetails"
+				"group": "weatherDetails",
+				"allowGray": true
 			}
 		]
 	},

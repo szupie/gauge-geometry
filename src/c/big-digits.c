@@ -151,6 +151,13 @@ void set_digits_colour(GColor colour) {
 	load_digit_bitmaps();
 	for (int slot_number=0; slot_number<TOTAL_TIME_DIGITS; slot_number++) {
 		update_slot(slot_number);
+
+		#ifdef PBL_BW
+		bitmap_layer_set_compositing_mode(digit_layers[slot_number], GCompOpAnd);
+		if (gcolor_equal(time_colour, GColorWhite)) {
+			bitmap_layer_set_compositing_mode(digit_layers[slot_number], GCompOpSet);
+		}
+		#endif
 	}
 }
 
