@@ -4,9 +4,13 @@
 
 #include "enamel.h"
 
+#define EXPIRE_TIME 60*60*24*2 // 2 days
+
+// these are keys for persistent storage
 uint32_t persist_temp_now = 1;
 uint32_t persist_temp_min = 2;
 uint32_t persist_temp_max = 3;
+uint32_t persist_temp_expire = 4;
 
 static int temp_min, temp_max, temp_now;
 static bool temp_range_defined = false;
@@ -131,16 +135,24 @@ void init_weather(Layer *range_layer, Layer *now_layer) {
 
 	temp_unit = enamel_get_TEMP_UNIT()[0];
 
-	if (persist_exists(persist_temp_min) && persist_exists(persist_temp_max)) {
-		update_temp_range(
-			persist_read_int(persist_temp_min),
-			persist_read_int(persist_temp_max)
-		);
-	}
-	if (persist_exists(persist_temp_now)) {
-		update_temp_now(
-			persist_read_int(persist_temp_now)
-		);
+	if (persist_exists(persist_temp_expire)) {
+		if (persist_read_int(persist_temp_expire) > time(NULL)) {
+
+			if (persist_exists(persist_temp_min) && persist_exists(persist_temp_max)) {
+				update_temp_range(
+					persist_read_int(persist_temp_min),
+					persist_read_int(persist_temp_max)
+				);
+			}
+			if (persist_exists(persist_temp_now)) {
+				update_temp_now(
+					persist_read_int(persist_temp_now)
+				);
+			}
+		} else {
+			// weather has expired
+			clear_weather_cache();
+		}
 	}
 }
 
@@ -164,11 +176,7 @@ void check_temp_unit_change() {
 	char latest_unit = enamel_get_TEMP_UNIT()[0];
 	// Clear cached temps when switching units as old values become nonsense
 	if (latest_unit != temp_unit) {
-		persist_delete(persist_temp_now);
-		persist_delete(persist_temp_min);
-		persist_delete(persist_temp_max);
-		temp_range_defined = false;
-		temp_now_defined = false;
+		clear_weather_cache();
 
 		layer_mark_dirty(temp_range_layer);
 		layer_mark_dirty(temp_now_layer);
@@ -216,4 +224,15 @@ void handle_weather_update(DictionaryIterator *iterator, void *context) {
 		update_temp_now((int)temp_now_tuple->value->int32);
 		persist_write_int(persist_temp_now, temp_now);
 	}
+
+	persist_write_int(persist_temp_expire, time(NULL)+EXPIRE_TIME);
+}
+
+static void clear_weather_cache() {
+	persist_delete(persist_temp_now);
+	persist_delete(persist_temp_min);
+	persist_delete(persist_temp_max);
+	persist_delete(persist_temp_expire);
+	temp_range_defined = false;
+	temp_now_defined = false;
 }
