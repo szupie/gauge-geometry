@@ -22,6 +22,22 @@
 	},
 	{
 		"type": "section",
+		"capabilities": ["BW"],
+		"items": [
+			{
+				"type": "heading",
+				"id": "themes-accordion",
+				"defaultValue": "<span class='accordion-label'>Preset themes</span>",
+				"size": 4
+			},
+			{
+				"type": "text",
+				"defaultValue": "<section id='presetThemes' class='rect'><button data-theme-id='bw_light'>Light</button><button data-theme-id='bw_dark'>Dark</button></section>"
+			}
+		]
+	},
+	{
+		"type": "section",
 		"items": [
 			{
 				"type": "heading",
@@ -29,31 +45,15 @@
 			},
 			{
 				"type": "color",
-				"capabilities": ["COLOR"],
 				"messageKey": "HOUR_HAND_COLOUR",
 				"defaultValue": "AA0000",
-				"label": "Hour hand"
-			},
-			{
-				"type": "color",
-				"capabilities": ["COLOR"],
-				"messageKey": "MINUTE_HAND_COLOUR",
-				"defaultValue": "0055FF",
-				"label": "Minute hand"
-			},
-			{
-				"type": "color",
-				"capabilities": ["BW"],
-				"messageKey": "HOUR_HAND_COLOUR",
-				"defaultValue": "AAAAAA",
 				"label": "Hour hand",
 				"allowGray": true
 			},
 			{
 				"type": "color",
-				"capabilities": ["BW"],
 				"messageKey": "MINUTE_HAND_COLOUR",
-				"defaultValue": "AAAAAA",
+				"defaultValue": "0055FF",
 				"label": "Minute hand",
 				"allowGray": true
 			},
