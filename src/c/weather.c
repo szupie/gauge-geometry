@@ -127,6 +127,15 @@ static void temp_range_update_proc(Layer *layer, GContext *ctx) {
 	}
 }
 
+static void clear_weather_cache() {
+	persist_delete(persist_temp_now);
+	persist_delete(persist_temp_min);
+	persist_delete(persist_temp_max);
+	persist_delete(persist_temp_expire);
+	temp_range_defined = false;
+	temp_now_defined = false;
+}
+
 void init_weather(Layer *range_layer, Layer *now_layer) {
 	temp_range_layer = range_layer;
 	temp_now_layer = now_layer;
@@ -226,13 +235,4 @@ void handle_weather_update(DictionaryIterator *iterator, void *context) {
 	}
 
 	persist_write_int(persist_temp_expire, time(NULL)+EXPIRE_TIME);
-}
-
-static void clear_weather_cache() {
-	persist_delete(persist_temp_now);
-	persist_delete(persist_temp_min);
-	persist_delete(persist_temp_max);
-	persist_delete(persist_temp_expire);
-	temp_range_defined = false;
-	temp_now_defined = false;
 }

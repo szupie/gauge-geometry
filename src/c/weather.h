@@ -8,4 +8,3 @@ void update_temp_range(int min, int max);
 void update_temp_now(int now);
 void enable_temp(bool enabled);
 void handle_weather_update(DictionaryIterator *iterator, void *context);
-static void clear_weather_cache();
