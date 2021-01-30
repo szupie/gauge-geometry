@@ -12,13 +12,15 @@ static Layer *date_group_layer, *digits_layer, *ticks_canvas, *hands_layer, *tem
 
 static BatteryChargeState battery_state;
 
+static int ticks_level;
+static int charging_anim_frame = 0;
 
 static GColor bg_colour;
 static GColor date_colour;
 static GColor ticks_colour;
 static int ticks_size;
 
-static bool battery_gauge_enabled;
+static bool battery_gauge_enabled = false;
 
 static GPoint tick_positions[12];
 static const int num_ticks = sizeof(tick_positions)/sizeof(tick_positions[0]);
@@ -42,14 +44,31 @@ static void ticks_update_proc(Layer *layer, GContext *ctx) {
 	graphics_context_set_stroke_width(ctx, 3);
 	graphics_context_set_stroke_color(ctx, ticks_colour);
 
+	bool should_animate = battery_gauge_enabled && battery_state.is_charging;
+	// APP_LOG(APP_LOG_LEVEL_DEBUG, "redrawing ticks level %i, percentage %i", ticks_level, battery_state.charge_percent);
+
 	for (int i=0; i<num_ticks; i++) {
 		GPoint pos = tick_positions[i];
+		bool should_fill = true;
 
-		if (!battery_gauge_enabled || i < battery_state.charge_percent*0.01*num_ticks) {
+		if (!should_animate) {
+			should_fill = i < ticks_level;
+		} else {
+			// Charging animation
+			// Single unfilled tick cycles bubbles up to current level
+			should_fill = (i != charging_anim_frame) && (i < ticks_level);
+
+			// Alt: ticks fill clockwise up to current level;
+			// tick for current level always filled
+			// should_fill = (i < charging_anim_frame) || (i == ticks_level-1);
+		}
+		// APP_LOG(APP_LOG_LEVEL_DEBUG, "should fill? %i, index %i", should_fill, i);
+
+		if (should_fill) {
 			graphics_context_set_fill_color(ctx, ticks_colour);
 			graphics_fill_circle(ctx, pos, ticks_size);
 		} else {
-			if (ticks_size > 1) {
+			if (ticks_size > 1) { // leave blank when tick size too small
 				graphics_context_set_fill_color(ctx, bg_colour);
 				int ring_size = ticks_size;
 				if (ticks_size > 2) {
@@ -57,7 +76,6 @@ static void ticks_update_proc(Layer *layer, GContext *ctx) {
 				}
 				graphics_draw_circle(ctx, pos, ring_size);
 				graphics_fill_circle(ctx, pos, ring_size);
-				// check color TODO
 			}
 		}
 	}
@@ -182,7 +200,7 @@ void update_style() {
 	set_temp_now_colour(enamel_get_TEMP_NOW_COLOUR());
 	
 	layer_mark_dirty(hands_layer);
-	layer_mark_dirty(ticks_canvas);
+	update_battery_ticks(battery_state);
 
 	window_set_background_color(layer_get_window(window_layer), bg_colour);
 
@@ -212,8 +230,21 @@ void update_date_month(char *date) {
 	text_layer_set_text(date_shadow_text_layer_b, date);
 }
 
-void handle_battery_update(BatteryChargeState charge_state) {
+void update_battery_ticks(BatteryChargeState charge_state) {
 	battery_state = charge_state;
+
+	if (battery_gauge_enabled) {
+		ticks_level = battery_state.charge_percent*0.01*num_ticks;
+	} else {
+		ticks_level = num_ticks;
+	}
+
+	layer_mark_dirty(ticks_canvas);
+}
+
+void animate_charging_indicator() {
+	// increment tick animation
+	charging_anim_frame = (charging_anim_frame+1)%ticks_level;
 	layer_mark_dirty(ticks_canvas);
 }
 

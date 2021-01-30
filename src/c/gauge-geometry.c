@@ -9,6 +9,8 @@ static Window *main_window;
 
 static EventHandle settings_updated_handle;
 
+static bool last_charging_state;
+
 // #define DEBUGGING_TIME
 // #define DEMO_MODE
 
@@ -77,6 +79,29 @@ static void handle_minute_tick(struct tm *tick_time, TimeUnits units_changed) {
 	}
 }
 
+static void handle_second_tick(struct tm *tick_time, TimeUnits units_changed) {
+	if (units_changed & MINUTE_UNIT) {
+		handle_minute_tick(tick_time, units_changed);
+	}
+
+	animate_charging_indicator();
+}
+
+static void handle_battery_change(BatteryChargeState charge_state) {
+	update_battery_ticks(charge_state);
+
+	bool charging_changed = (last_charging_state != charge_state.is_charging);
+	last_charging_state = charge_state.is_charging;
+
+	if (charging_changed) {
+		if (charge_state.is_charging) {
+			tick_timer_service_subscribe(SECOND_UNIT, handle_second_tick);
+		} else {
+			tick_timer_service_subscribe(MINUTE_UNIT, handle_minute_tick);
+		}
+	}
+}
+
 static void refresh_date_time() {
 	time_t now = time(NULL);
 	struct tm *tick_time = localtime(&now);
@@ -121,19 +146,26 @@ static void main_window_load(Window *window) {
 	load_window(window);
 
 	#ifndef DEMO_MODE
-	battery_state_service_subscribe(handle_battery_update);
-	handle_battery_update(battery_state_service_peek());
-
 	tick_timer_service_subscribe(MINUTE_UNIT, handle_minute_tick);
+
+	BatteryChargeState charge_state = battery_state_service_peek();
+	// init charging state as opposite to force refresh
+	last_charging_state = !charge_state.is_charging;
+	handle_battery_change(charge_state);
+	battery_state_service_subscribe(handle_battery_change);
 
 	refresh_date_time();
 	#else
 	// static display in demo mode
 	update_time(10, 8);
 	update_day_of_week("Fri");
-	update_date_month("11 Nov");
+		#if defined(PBL_ROUND)
+		update_date_month("11 Nov");
+		#elif defined(PBL_RECT)
+		update_date_month("11\nNov");
+		#endif
 
-	handle_battery_update((BatteryChargeState){70, false, false});
+	update_battery_ticks((BatteryChargeState){70, false, false});
 
 	enable_temp(true);
 	update_temp_range(15, 25);
