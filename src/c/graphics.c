@@ -193,6 +193,22 @@ void update_style() {
 	ticks_colour = enamel_get_TICKS_COLOUR();
 	ticks_size = enamel_get_TICKS_SIZE();
 
+	switch (enamel_get_HANDS_SHAPE()) {
+		case HANDS_SHAPE_BAGUETTE: {
+			set_hands_shape(BAGUETTE);
+			break;
+		}
+		case HANDS_SHAPE_PENCIL: {
+			set_hands_shape(PENCIL);
+			break;
+		}
+		default:
+		case HANDS_SHAPE_DAUPHINE: {
+			set_hands_shape(DAUPHINE);
+			break;
+		}
+	}
+
 	battery_gauge_enabled = enamel_get_BATTERY_GAUGE_ENABLED();
 	enable_temp(enamel_get_TEMP_ENABLED());
 	check_temp_unit_change();

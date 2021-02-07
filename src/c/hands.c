@@ -225,9 +225,7 @@ static void start_animation() {
 void init_hands(Layer *layer) {
 	hands_layer = layer;
 
-	// set_hands_shape(PENCIL);
 	set_hands_shape(DAUPHINE);
-	// set_hands_shape(BAGUETTE);
 
 	layer_set_update_proc(hands_layer, hands_update_proc);
 }
@@ -244,6 +242,9 @@ void set_hands_shape(enum HandShape shape) {
 	hand_shape = shape;
 
 	set_hand_paths(hand_shape);
+
+	gpath_rotate_to(hour_hand_path, hour_angle_target);
+	gpath_rotate_to(minute_hand_path, minute_angle_target);
 }
 
 void set_hands(unsigned short hour, unsigned short minute) {

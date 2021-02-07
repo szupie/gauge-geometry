@@ -45,20 +45,6 @@
 			},
 			{
 				"type": "color",
-				"messageKey": "HOUR_HAND_COLOUR",
-				"defaultValue": "AA0000",
-				"label": "Hour hand",
-				"allowGray": true
-			},
-			{
-				"type": "color",
-				"messageKey": "MINUTE_HAND_COLOUR",
-				"defaultValue": "0055FF",
-				"label": "Minute hand",
-				"allowGray": true
-			},
-			{
-				"type": "color",
 				"messageKey": "TIME_COLOUR",
 				"defaultValue": "000000",
 				"label": "Digital time"
@@ -74,6 +60,40 @@
 				"messageKey": "BG_COLOUR",
 				"defaultValue": "FFFFFF",
 				"label": "Background"
+			},
+			{
+				"type": "color",
+				"messageKey": "HOUR_HAND_COLOUR",
+				"defaultValue": "AA0000",
+				"label": "Hour hand",
+				"allowGray": true
+			},
+			{
+				"type": "color",
+				"messageKey": "MINUTE_HAND_COLOUR",
+				"defaultValue": "0055FF",
+				"label": "Minute hand",
+				"allowGray": true
+			},
+			{
+				"type": "radiogroup",
+				"messageKey": "HANDS_SHAPE",
+				"label": "Hand type",
+				"defaultValue": "0",
+				"options": [
+					{ 
+						"label": "Dauphine", 
+						"value": 0 
+					},
+					{ 
+						"label": "Pencil", 
+						"value": 1 
+					},
+					{ 
+						"label": "Baguette", 
+						"value": 2 
+					}
+				]
 			}
 		]
 	},
