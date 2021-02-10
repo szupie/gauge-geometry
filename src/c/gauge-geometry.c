@@ -84,7 +84,9 @@ static void handle_second_tick(struct tm *tick_time, TimeUnits units_changed) {
 		handle_minute_tick(tick_time, units_changed);
 	}
 
-	animate_charging_indicator();
+	if(tick_time->tm_sec % 2 == 0) {
+		animate_charging_indicator();
+	}
 }
 
 static void handle_battery_change(BatteryChargeState charge_state) {
