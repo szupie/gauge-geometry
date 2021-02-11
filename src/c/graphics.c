@@ -214,6 +214,14 @@ void update_style() {
 			set_hands_shape(PENCIL);
 			break;
 		}
+		case HANDS_SHAPE_BREGUET: {
+			set_hands_shape(BREGUET);
+			break;
+		}
+		case HANDS_SHAPE_SWISS_RAIL: {
+			set_hands_shape(SWISSRAIL);
+			break;
+		}
 		default:
 		case HANDS_SHAPE_DAUPHINE: {
 			set_hands_shape(DAUPHINE);

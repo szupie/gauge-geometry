@@ -1,6 +1,6 @@
 #include <pebble.h>
 
-enum HandShape { DAUPHINE, BAGUETTE, PENCIL };
+enum HandShape { DAUPHINE, BAGUETTE, PENCIL, BREGUET, SWISSRAIL };
 
 #define DAUPINE_HOUR_THICKNESS 8
 #define DAUPINE_MINUTE_THICKNESS 6
@@ -44,5 +44,31 @@ static const GPathInfo PENCIL_MINUTE_POINTS = {
 	2, (GPoint []){
 		{0, 0},
 		{0, -65}
+	}
+};
+
+static const GPathInfo BREGUET_HOUR_POINTS = {
+	2, (GPoint []){
+		{0, 0},
+		{0, -50}
+	}
+};
+static const GPathInfo BREGUET_MINUTE_POINTS = {
+	2, (GPoint []){
+		{0, 0},
+		{0, -85}
+	}
+};
+
+static const GPathInfo SWISSRAIL_HOUR_POINTS = {
+	2, (GPoint []){
+		{0, 18},
+		{0, -37}
+	}
+};
+static const GPathInfo SWISSRAIL_MINUTE_POINTS = {
+	2, (GPoint []){
+		{0, 20},
+		{0, -70}
 	}
 };

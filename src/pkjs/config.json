@@ -81,17 +81,25 @@
 				"label": "Hand type",
 				"defaultValue": "0",
 				"options": [
-					{ 
-						"label": "Dauphine", 
-						"value": 0 
+					{
+						"label": "Dauphine",
+						"value": 0
 					},
-					{ 
-						"label": "Pencil", 
-						"value": 1 
+					{
+						"label": "Pencil",
+						"value": 1
 					},
-					{ 
-						"label": "Baguette", 
-						"value": 2 
+					{
+						"label": "Baguette",
+						"value": 2
+					},
+					{
+						"label": "Breguet",
+						"value": 3
+					},
+					{
+						"label": "Swiss Rail",
+						"value": 4
 					}
 				]
 			}
