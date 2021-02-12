@@ -21,6 +21,7 @@ static const GPathInfo DAUPHINE_MINUTE_POINTS = {
 	}
 };
 
+static const int BAGUETTE_THICKNESS = 7;
 static const GPathInfo BAGUETTE_HOUR_POINTS = {
 	2, (GPoint []){
 		{0, 0},
@@ -34,6 +35,9 @@ static const GPathInfo BAGUETTE_MINUTE_POINTS = {
 	}
 };
 
+static const float PENCIL_SHARPNESS = 4.2;
+static const int PENCIL_THICKNESS = 5;
+static const int PENCIL_AXLE_RADIUS = 6;
 static const GPathInfo PENCIL_HOUR_POINTS = {
 	2, (GPoint []){
 		{0, 0},
@@ -47,6 +51,13 @@ static const GPathInfo PENCIL_MINUTE_POINTS = {
 	}
 };
 
+static const int BREGUET_THICKNESS = 5;
+static const int BREGUET_HOUR_RADIUS = 7;
+static const int BREGUET_MINUTE_RADIUS = 6;
+static const int BREGUET_EYE_THICKNESS = 3;
+static const int BREGUET_AXLE_RADIUS = 5;
+static const int BREGUET_HOUR_EYE_DIST = 31;
+static const int BREGUET_MINUTE_EYE_DIST = 65;
 static const GPathInfo BREGUET_HOUR_POINTS = {
 	2, (GPoint []){
 		{0, 0},
@@ -60,6 +71,10 @@ static const GPathInfo BREGUET_MINUTE_POINTS = {
 	}
 };
 
+static const int SWISSRAIL_THICKNESS = 3;
+static const int SWISSRAIL_HOUR_RADIUS = 7;
+static const int SWISSRAIL_MINUTE_RADIUS = 6;
+static const int SWISSRAIL_AXLE_RADIUS = 3;
 static const GPathInfo SWISSRAIL_HOUR_POINTS = {
 	2, (GPoint []){
 		{0, 18},

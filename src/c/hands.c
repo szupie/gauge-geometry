@@ -64,10 +64,28 @@ static void create_hand_paths(enum HandShape shape) {
 	}
 }
 
-// Draw hand by repeatedly drawing same path across transverse axis
-// Point at center created by pushing inward lines further from center
+// Kickstarter style rounded hands
+// This style is more abstract and less physical. The hands fuse together
+// on the same layer, so the outlines go behind both hands
+static void draw_baguette_hands(GContext *ctx) {
+	// outline by drawing line thicker
+	graphics_context_set_stroke_width(ctx, BAGUETTE_THICKNESS+2);
+	graphics_context_set_stroke_color(ctx, get_bg_colour());
+	gpath_draw_outline_open(ctx, minute_path);
+	gpath_draw_outline_open(ctx, hour_path);
+
+	graphics_context_set_stroke_width(ctx, BAGUETTE_THICKNESS);
+	graphics_context_set_stroke_color(ctx, minute_hand_colour);
+	gpath_draw_outline_open(ctx, minute_path);
+	graphics_context_set_stroke_color(ctx, hour_hand_colour);
+	gpath_draw_outline_open(ctx, hour_path);
+}
+
+// Helper function to draw pencil hands at specified thickness and colour
+// Draws unrounded shape with parallel sides at consistent thickness
+// by repeatedly drawing same 1px path across transverse axis
+// Point at center created by pushing inner lines outwards from center
 static void draw_pencil_hand(GPath * path, int width, int density, GColor colour, GPoint origin, GContext *ctx) {
-	float pointy_factor = 4.2;
 	// move hand toward rim to prevent center end from jutting past center axle
 	int outset_distance = width*1.5;
 
@@ -81,7 +99,7 @@ static void draw_pencil_hand(GPath * path, int width, int density, GColor colour
 	for (int i=0; i<width*density; i++) {
 		float side_offset = (i+1)/(float)density - width/2.0;
 		float offcenterness = abs((i+1) - width*density/2.0)/(float)density;
-		float pointy_offset = pointy_factor*offcenterness - outset_distance;
+		float pointy_offset = PENCIL_SHARPNESS*offcenterness - outset_distance;
 
 		float offset_x = h_scale*side_offset - v_scale*pointy_offset;
 		float offset_y = v_scale*side_offset + h_scale*pointy_offset;
@@ -92,165 +110,150 @@ static void draw_pencil_hand(GPath * path, int width, int density, GColor colour
 }
 
 static void draw_pencil_hands(GPoint center, GContext *ctx) {
-	int width = 5;
 	int density = 4;
 
 	int stroke_density = 2;
 	int stroke_outset = 2;
 
-	int axle_radius = width+1;
-
 	int32_t hour_angle = hour_path->rotation;
 	int32_t minute_angle = minute_path->rotation;
 
+	// === Minute hand ===
 	// minute hand stroke (same path drawn thicker and outset) then fill
 	GPoint minute_stroke_origin = { 
 		center.x+sin_lookup(minute_angle)*stroke_outset/TRIG_MAX_RATIO, 
 		center.y-cos_lookup(minute_angle)*stroke_outset/TRIG_MAX_RATIO
 	};
-	draw_pencil_hand(minute_path, width+2, stroke_density, get_bg_colour(), minute_stroke_origin, ctx);
-	draw_pencil_hand(minute_path, width, density, minute_hand_colour, center, ctx);
+	draw_pencil_hand(minute_path, PENCIL_THICKNESS+2, stroke_density, get_bg_colour(), minute_stroke_origin, ctx);
+	draw_pencil_hand(minute_path, PENCIL_THICKNESS, density, minute_hand_colour, center, ctx);
 
 	// draw native thick stroke to cover any missing areas
 	// inset path to hide rounded ends
 	GPoint minute_native_origin = {
-		center.x-sin_lookup(minute_angle)*width/TRIG_MAX_RATIO, 
-		center.y+cos_lookup(minute_angle)*width/TRIG_MAX_RATIO
+		center.x-sin_lookup(minute_angle)*PENCIL_THICKNESS/TRIG_MAX_RATIO, 
+		center.y+cos_lookup(minute_angle)*PENCIL_THICKNESS/TRIG_MAX_RATIO
 	};
 	gpath_move_to(minute_path, minute_native_origin);
-	graphics_context_set_stroke_width(ctx, width);
+	graphics_context_set_stroke_width(ctx, PENCIL_THICKNESS);
 	graphics_context_set_stroke_color(ctx, minute_hand_colour);
 	gpath_draw_outline_open(ctx, minute_path);
 
+
+	// === Hour hand ===
 	// center axle stroke
 	graphics_context_set_stroke_width(ctx, 1);
 	graphics_context_set_stroke_color(ctx, get_bg_colour());
-	graphics_draw_circle(ctx, center, axle_radius+1);
+	graphics_draw_circle(ctx, center, PENCIL_AXLE_RADIUS+1);
 
 	// hour hand stroke then fill
 	GPoint hour_stroke_origin = { 
 		center.x+sin_lookup(hour_angle)*stroke_outset/TRIG_MAX_RATIO, 
 		center.y-cos_lookup(hour_angle)*stroke_outset/TRIG_MAX_RATIO
 	};
-	draw_pencil_hand(hour_path, width+2, stroke_density, get_bg_colour(), hour_stroke_origin, ctx);
-	draw_pencil_hand(hour_path, width, density, hour_hand_colour, center, ctx);
+	draw_pencil_hand(hour_path, PENCIL_THICKNESS+2, stroke_density, get_bg_colour(), hour_stroke_origin, ctx);
+	draw_pencil_hand(hour_path, PENCIL_THICKNESS, density, hour_hand_colour, center, ctx);
 
 	// native thick stroke for coverage
 	GPoint hour_native_origin = {
-		center.x-sin_lookup(hour_angle)*width/TRIG_MAX_RATIO, 
-		center.y+cos_lookup(hour_angle)*width/TRIG_MAX_RATIO
+		center.x-sin_lookup(hour_angle)*PENCIL_THICKNESS/TRIG_MAX_RATIO, 
+		center.y+cos_lookup(hour_angle)*PENCIL_THICKNESS/TRIG_MAX_RATIO
 	};
 	gpath_move_to(hour_path, hour_native_origin);
-	graphics_context_set_stroke_width(ctx, width);
+	graphics_context_set_stroke_width(ctx, PENCIL_THICKNESS);
 	graphics_context_set_stroke_color(ctx, hour_hand_colour);
 	gpath_draw_outline_open(ctx, hour_path);
 
 	// center axle fill
 	graphics_context_set_fill_color(ctx, hour_hand_colour);
-	graphics_fill_circle(ctx, center, axle_radius);
+	graphics_fill_circle(ctx, center, PENCIL_AXLE_RADIUS);
 
-}
-
-static void draw_baguette_hands(GContext *ctx) {
-	int width = 7;
-
-	// stroke by drawing line thicker
-	graphics_context_set_stroke_width(ctx, width+2);
-	graphics_context_set_stroke_color(ctx, get_bg_colour());
-	gpath_draw_outline_open(ctx, minute_path);
-	gpath_draw_outline_open(ctx, hour_path);
-
-	graphics_context_set_stroke_width(ctx, width);
-	graphics_context_set_stroke_color(ctx, minute_hand_colour);
-	gpath_draw_outline_open(ctx, minute_path);
-	graphics_context_set_stroke_color(ctx, hour_hand_colour);
-	gpath_draw_outline_open(ctx, hour_path);
 }
 
 static void draw_breguet_hands(GPoint center, GContext *ctx) {
-	int width = 5;
-
-	int hour_radius = 7;
-	int minute_radius = 6;
-	int ring_width = 3;
-
-	int axle_radius = 5;
-
-	int hour_bubble_dist = 31;
-	int minute_bubble_dist = 65;
-
 	int32_t hour_angle = hour_path->rotation;
 	int32_t minute_angle = minute_path->rotation;
 
-	GPoint hour_circle_pos = {
-		center.x+v_component(hour_angle)*hour_bubble_dist, 
-		center.y-h_component(hour_angle)*hour_bubble_dist
+	const int minute_hole_radius = BREGUET_MINUTE_RADIUS-BREGUET_EYE_THICKNESS;
+	const int hour_hole_radius = BREGUET_HOUR_RADIUS-BREGUET_EYE_THICKNESS;
+
+	GPoint hour_eye_pos = {
+		center.x+v_component(hour_angle)*BREGUET_HOUR_EYE_DIST, 
+		center.y-h_component(hour_angle)*BREGUET_HOUR_EYE_DIST
 	};
-	GPoint hour_bubble_pos = {
-		hour_circle_pos.x+v_component(hour_angle)*(ring_width-1), 
-		hour_circle_pos.y-h_component(hour_angle)*(ring_width-1)
+	GPoint hour_hole_pos = {
+		hour_eye_pos.x+v_component(hour_angle)*(BREGUET_EYE_THICKNESS-1), 
+		hour_eye_pos.y-h_component(hour_angle)*(BREGUET_EYE_THICKNESS-1)
 	};
-	GPoint minute_circle_pos = {
-		center.x+v_component(minute_angle)*minute_bubble_dist, 
-		center.y-h_component(minute_angle)*minute_bubble_dist
+	GPoint minute_eye_pos = {
+		center.x+v_component(minute_angle)*BREGUET_MINUTE_EYE_DIST, 
+		center.y-h_component(minute_angle)*BREGUET_MINUTE_EYE_DIST
 	};
-	GPoint minute_bubble_pos = {
-		minute_circle_pos.x+v_component(minute_angle)*(ring_width-1), 
-		minute_circle_pos.y-h_component(minute_angle)*(ring_width-1)
+	GPoint minute_hole_pos = {
+		minute_eye_pos.x+v_component(minute_angle)*(BREGUET_EYE_THICKNESS-1), 
+		minute_eye_pos.y-h_component(minute_angle)*(BREGUET_EYE_THICKNESS-1)
 	};
 
-	// stroke by drawing line thicker
-	graphics_context_set_stroke_width(ctx, width+2);
+	// === Minute hand ===
+	// Outlines
 	graphics_context_set_stroke_color(ctx, get_bg_colour());
-	gpath_draw_outline_open(ctx, minute_path);
-	gpath_draw_outline_open(ctx, hour_path);
-
-	// graphics_context_set_stroke_width(ctx, bubble_width);
-
-	// stroke bubbles
-	graphics_context_set_stroke_width(ctx, 1);
 	graphics_context_set_fill_color(ctx, get_bg_colour());
-	graphics_fill_circle(ctx, hour_circle_pos, hour_radius+1);
-	graphics_fill_circle(ctx, minute_circle_pos, minute_radius+1);
+
+	// outline eye
+	graphics_context_set_stroke_width(ctx, 1);
+	graphics_fill_circle(ctx, minute_eye_pos, BREGUET_MINUTE_RADIUS+1);
+
+	// outline hand by drawing line thicker
+	graphics_context_set_stroke_width(ctx, BREGUET_THICKNESS+2);
+	gpath_draw_outline_open(ctx, minute_path);
+
+	// Fills
+	graphics_context_set_stroke_color(ctx, minute_hand_colour);
+	graphics_context_set_fill_color(ctx, minute_hand_colour);
 
 	// minute hand
-	graphics_context_set_stroke_color(ctx, minute_hand_colour);
-	graphics_context_set_stroke_width(ctx, width);
+	graphics_context_set_stroke_width(ctx, BREGUET_THICKNESS);
 	gpath_draw_outline_open(ctx, minute_path);
 
-	// graphics_context_set_stroke_width(ctx, bubble_width);
-	graphics_context_set_fill_color(ctx, minute_hand_colour);
-	graphics_fill_circle(ctx, minute_circle_pos, minute_radius);
+	// minute hand eye
+	graphics_fill_circle(ctx, minute_eye_pos, BREGUET_MINUTE_RADIUS);
 	graphics_context_set_fill_color(ctx, get_bg_colour());
-	graphics_fill_circle(ctx, minute_bubble_pos, minute_radius-ring_width);
+	graphics_fill_circle(ctx, minute_hole_pos, minute_hole_radius);
 
-	// stroke axle
-	graphics_context_set_stroke_width(ctx, 1);
+	// === Hour hand ===
+	// Outlines
 	graphics_context_set_stroke_color(ctx, get_bg_colour());
-	graphics_draw_circle(ctx, center, axle_radius+1);
+	graphics_context_set_fill_color(ctx, get_bg_colour());
+	graphics_context_set_stroke_width(ctx, 1);
 
-	// hour hand
-	graphics_context_set_stroke_color(ctx, hour_hand_colour);
-	graphics_context_set_stroke_width(ctx, width);
+	// outline axle
+	graphics_draw_circle(ctx, center, BREGUET_AXLE_RADIUS+1);
+
+	// outline eye
+	graphics_fill_circle(ctx, hour_eye_pos, BREGUET_HOUR_RADIUS+1);
+
+	// outline hand by drawing line thicker
+	graphics_context_set_stroke_width(ctx, BREGUET_THICKNESS+2);
 	gpath_draw_outline_open(ctx, hour_path);
 
-	// graphics_context_set_stroke_width(ctx, bubble_width);
+	// Fills
+	graphics_context_set_stroke_color(ctx, hour_hand_colour);
 	graphics_context_set_fill_color(ctx, hour_hand_colour);
-	graphics_fill_circle(ctx, hour_circle_pos, hour_radius);
-	graphics_context_set_fill_color(ctx, get_bg_colour());
-	graphics_fill_circle(ctx, hour_bubble_pos, hour_radius-ring_width);
 
-	// center axle fill
-	graphics_context_set_fill_color(ctx, hour_hand_colour);
-	graphics_fill_circle(ctx, center, axle_radius);
+	// center axle
+	graphics_fill_circle(ctx, center, BREGUET_AXLE_RADIUS);
+
+	// hour hand
+	graphics_context_set_stroke_width(ctx, BREGUET_THICKNESS);
+	gpath_draw_outline_open(ctx, hour_path);
+
+	// hour hand eye
+	graphics_fill_circle(ctx, hour_eye_pos, BREGUET_HOUR_RADIUS);
+	graphics_context_set_fill_color(ctx, get_bg_colour());
+	graphics_fill_circle(ctx, hour_hole_pos, hour_hole_radius);
 }
 
+// Based on second hand of swiss railway station clocks
 static void draw_swissrail_hands(GPoint center, GContext *ctx) {
-	int width = 3;
-	int hour_radius = 7;
-	int minute_radius = 7;
-	int axle_radius = 3;
-
 	int hour_bubble_dist = -hour_path->points[hour_path->num_points-1].y;
 	int minute_bubble_dist = -minute_path->points[minute_path->num_points-1].y;
 
@@ -266,39 +269,49 @@ static void draw_swissrail_hands(GPoint center, GContext *ctx) {
 		center.y-cos_lookup(minute_angle)*minute_bubble_dist/TRIG_MAX_RATIO
 	};
 
-	// stroke by drawing line thicker
-	graphics_context_set_stroke_width(ctx, width+2);
+	// === Minute hand ===
+	// Outlines
 	graphics_context_set_stroke_color(ctx, get_bg_colour());
-	gpath_draw_outline_open(ctx, minute_path);
-	gpath_draw_outline_open(ctx, hour_path);
-
-	// stroke bubbles
 	graphics_context_set_stroke_width(ctx, 1);
-	graphics_draw_circle(ctx, hour_bubble_pos, hour_radius+1);
-	graphics_draw_circle(ctx, minute_bubble_pos, minute_radius+1);
+
+	// outline bubble
+	graphics_draw_circle(ctx, minute_bubble_pos, SWISSRAIL_MINUTE_RADIUS+1);
+
+	// outline by drawing line thicker
+	graphics_context_set_stroke_width(ctx, SWISSRAIL_THICKNESS+2);
+	gpath_draw_outline_open(ctx, minute_path);
 
 	// minute hand
-	graphics_context_set_stroke_width(ctx, width);
+	graphics_context_set_stroke_width(ctx, SWISSRAIL_THICKNESS);
 	graphics_context_set_stroke_color(ctx, minute_hand_colour);
 	graphics_context_set_fill_color(ctx, minute_hand_colour);
 	gpath_draw_outline_open(ctx, minute_path);
-	graphics_fill_circle(ctx, minute_bubble_pos, minute_radius);
+	graphics_fill_circle(ctx, minute_bubble_pos, SWISSRAIL_MINUTE_RADIUS);
 
-	// stroke axle
-	graphics_context_set_stroke_width(ctx, 1);
+	// === Hour hand ===
+	// Outlines
 	graphics_context_set_stroke_color(ctx, get_bg_colour());
-	graphics_draw_circle(ctx, center, axle_radius+1);
+	graphics_context_set_stroke_width(ctx, 1);
+
+	// outline axle
+	graphics_draw_circle(ctx, center, SWISSRAIL_AXLE_RADIUS+1);
+
+	// outline bubble
+	graphics_draw_circle(ctx, hour_bubble_pos, SWISSRAIL_HOUR_RADIUS+1);
+
+	// outline by drawing line thicker
+	graphics_context_set_stroke_width(ctx, SWISSRAIL_THICKNESS+2);
+	gpath_draw_outline_open(ctx, hour_path);
 
 	// hour hand
-	graphics_context_set_stroke_width(ctx, width);
+	graphics_context_set_stroke_width(ctx, SWISSRAIL_THICKNESS);
 	graphics_context_set_stroke_color(ctx, hour_hand_colour);
 	graphics_context_set_fill_color(ctx, hour_hand_colour);
 	gpath_draw_outline_open(ctx, hour_path);
-	graphics_fill_circle(ctx, hour_bubble_pos, hour_radius);
+	graphics_fill_circle(ctx, hour_bubble_pos, SWISSRAIL_HOUR_RADIUS);
 
 	// center axle fill
-	graphics_context_set_fill_color(ctx, hour_hand_colour);
-	graphics_fill_circle(ctx, center, axle_radius);
+	graphics_fill_circle(ctx, center, SWISSRAIL_AXLE_RADIUS);
 }
 
 
