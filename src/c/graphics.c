@@ -205,7 +205,7 @@ void update_style() {
 	ticks_colour = enamel_get_TICKS_COLOUR();
 	ticks_size = enamel_get_TICKS_SIZE();
 
-	switch (enamel_get_HANDS_SHAPE()) {
+	switch (enamel_get_hands_shape()) {
 		case HANDS_SHAPE_BAGUETTE: {
 			set_hands_shape(BAGUETTE);
 			break;

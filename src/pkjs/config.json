@@ -80,6 +80,7 @@
 				"messageKey": "HANDS_SHAPE",
 				"label": "Hand type",
 				"defaultValue": "0",
+				"id": "hands-shape",
 				"options": [
 					{
 						"label": "Dauphine",

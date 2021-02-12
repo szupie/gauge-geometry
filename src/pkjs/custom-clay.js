@@ -111,6 +111,21 @@ module.exports = function(minified) {
 			'}'
 		);
 
+		const handsShapeSection = clayConfig.getItemById('hands-shape').$element;
+		handsShapeSection.set('id', 'hands-shape');
+		$('label .label', handsShapeSection).each(function (item) {
+			item.innerHTML = '<svg width="180" height="20">'+
+				handSVGs[item.textContent]+
+				'</svg>';
+		});
+		$('#config-style').add(
+			'#hands-shape .label > svg {'+
+				"margin-left: -80px;"+
+				"transform: scale(0.9);"+
+				"opacity: 0.8;"+
+			'}'
+		);
+
 		// Weather request can only be triggered on save, 
 		// so make button toggle hidden setting that gets reset every time
 		const forceWeatherToggle = clayConfig.getItemByMessageKey('UPDATE_WEATHER_ON_CONFIG');
@@ -416,6 +431,14 @@ module.exports = function(minified) {
 			'TEMP_RANGE_COLOUR': 'AAAAAA'
 		}
 	};
+
+	const handSVGs = {
+		'Dauphine': '<path fill-rule="evenodd" clip-rule="evenodd" d="M84 10l6-6 80 6-80 6-6-6z" fill="#fff"/></svg>',
+		'Pencil': '<path fill-rule="evenodd" clip-rule="evenodd" d="M153 7l10 3-10 3H87V7h66z" fill="#fff"/><circle cx="90" cy="10" r="6" fill="#fff"/>',
+		'Baguette': '<path d="M160 10H90" stroke="#fff" stroke-width="5" stroke-linecap="round"/>',
+		'Breguet': '<path d="M175 10H90" stroke="#fff" stroke-width="5" stroke-linecap="round"/><circle cx="90" cy="10" r="5" fill="#fff"/><circle cx="155" cy="10" r="6" fill="#fff"/><circle cx="156.5" cy="10" r="3.5" fill="#484848"/>',
+		'Swiss Rail': '<path d="M160 10H70" stroke="#fff" stroke-width="3" stroke-linecap="round"/><circle cx="90" cy="10" r="3" fill="#fff"/><circle cx="160" cy="10" r="6" fill="#fff"/>'
+	}
 
 
 	const screenshots = {
