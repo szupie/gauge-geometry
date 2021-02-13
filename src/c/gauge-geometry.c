@@ -1,5 +1,6 @@
 #include <pebble.h>
 #include "graphics.h"
+#include "ticks.h"
 #include "weather.h"
 
 #include "enamel.h"

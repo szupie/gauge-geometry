@@ -45,6 +45,12 @@
 			},
 			{
 				"type": "color",
+				"messageKey": "BG_COLOUR",
+				"defaultValue": "FFFFFF",
+				"label": "Background"
+			},
+			{
+				"type": "color",
 				"messageKey": "TIME_COLOUR",
 				"defaultValue": "000000",
 				"label": "Digital time"
@@ -54,12 +60,6 @@
 				"messageKey": "DATE_COLOUR",
 				"defaultValue": "000055",
 				"label": "Date"
-			},
-			{
-				"type": "color",
-				"messageKey": "BG_COLOUR",
-				"defaultValue": "FFFFFF",
-				"label": "Background"
 			},
 			{
 				"type": "color",

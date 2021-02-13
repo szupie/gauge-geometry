@@ -1,5 +1,5 @@
-#include "graphics.h"
 #include "hands.h"
+#include "graphics.h"
 
 static Layer *hands_layer;
 
@@ -31,8 +31,7 @@ static float h_component(int32_t angle) {
 }
 
 static void create_hand_paths(enum HandShape shape) {
-	gpath_destroy(hour_path);
-	gpath_destroy(minute_path);
+	destroy_hands();
 
 	switch (shape) {
 		case BAGUETTE: {
@@ -314,7 +313,6 @@ static void draw_swissrail_hands(GPoint center, GContext *ctx) {
 	graphics_fill_circle(ctx, center, SWISSRAIL_AXLE_RADIUS);
 }
 
-
 static void draw_dauphine_hands(GContext *ctx) {
 	graphics_context_set_fill_color(ctx, minute_hand_colour);
 	graphics_context_set_stroke_color(ctx, get_bg_colour());
@@ -353,6 +351,19 @@ static void hands_update_proc(Layer *layer, GContext *ctx) {
 			draw_dauphine_hands(ctx);
 		}
 	}
+}
+
+static void set_hands_shape(enum HandShape shape) {
+	hand_shape = shape;
+
+	create_hand_paths(hand_shape);
+
+	GRect bounds = layer_get_bounds(hands_layer);
+	gpath_move_to(hour_path, grect_center_point(&bounds));
+	gpath_move_to(minute_path, grect_center_point(&bounds));
+
+	gpath_rotate_to(hour_path, hour_angle_target);
+	gpath_rotate_to(minute_path, minute_angle_target);
 }
 
 static void animation_teardown(Animation *animation) {
@@ -405,25 +416,12 @@ void init_hands(Layer *layer) {
 	layer_set_update_proc(hands_layer, hands_update_proc);
 }
 
-void set_hour_hand_colour(GColor colour) {
-	hour_hand_colour = colour;
-}
+void update_hands_settings(GColor hour, GColor minute, enum HandShape shape) {
+	hour_hand_colour = hour;
+	minute_hand_colour = minute;
+	set_hands_shape(shape);
 
-void set_minute_hand_colour(GColor colour) {
-	minute_hand_colour = colour;
-}
-
-void set_hands_shape(enum HandShape shape) {
-	hand_shape = shape;
-
-	create_hand_paths(hand_shape);
-
-	GRect bounds = layer_get_bounds(hands_layer);
-	gpath_move_to(hour_path, grect_center_point(&bounds));
-	gpath_move_to(minute_path, grect_center_point(&bounds));
-
-	gpath_rotate_to(hour_path, hour_angle_target);
-	gpath_rotate_to(minute_path, minute_angle_target);
+	layer_mark_dirty(hands_layer);
 }
 
 void set_hands(unsigned short hour, unsigned short minute) {

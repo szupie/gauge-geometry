@@ -1,6 +1,7 @@
 #include "graphics.h"
 #include "big-digits.h"
 #include "hands.h"
+#include "ticks.h"
 #include "weather.h"
 
 #include "enamel.h"
@@ -8,90 +9,10 @@
 static Layer* window_layer;
 
 static TextLayer *day_text_layer, *date_text_layer, *day_shadow_text_layer, *date_shadow_text_layer_a, *date_shadow_text_layer_b;
-static Layer *date_group_layer, *digits_layer, *ticks_canvas, *hands_layer, *temp_range_layer, *temp_now_layer;
-
-static BatteryChargeState battery_state;
-
-static int ticks_level;
+static Layer *date_group_layer, *digits_layer, *ticks_layer, *hands_layer, *temp_range_layer, *temp_now_layer;
 
 static GColor bg_colour;
 static GColor date_colour;
-static GColor ticks_colour;
-static int ticks_size;
-
-static bool battery_gauge_enabled = false;
-
-#define num_ticks 12
-static GPoint tick_positions[num_ticks];
-
-static Animation *charging_animation;
-static AnimationImplementation animation_implementation;
-static int animating_tick_sizes[num_ticks];
-
-
-static int min(int a, int b) {
-    return a < b ? a : b;
-}
-
-static void init_tick_positions(Layer *layer) {
-	GRect bounds = layer_get_bounds(layer);
-	GRect insetRect = grect_inset(bounds, GEdgeInsets(RING_INSET));
-	for (int i=0; i<num_ticks; i++) {
-		int hour_angle = DEG_TO_TRIGANGLE(i*360/num_ticks);
-
-		#if defined(PBL_ROUND)
-		tick_positions[i] = gpoint_from_polar(insetRect, GOvalScaleModeFitCircle, hour_angle);
-		#elif defined(PBL_RECT)
-		tick_positions[i] = get_point_at_rect_perim(hour_angle, insetRect);
-		#endif
-	}
-}
-
-static void charging_animation_update(Animation *animation, const AnimationProgress progress) {
-	float staggerness = 4.6;
-	float staggered_percent = (staggerness+1)*progress/ANIMATION_NORMALIZED_MAX;
-	for (int i=0; i<num_ticks; i++) {
-		if (i < ticks_level) {
-			float tick_percent = staggered_percent-staggerness*i/(num_ticks-1);
-			animating_tick_sizes[i] = min(ticks_size, ticks_size*tick_percent);
-		} else {
-			animating_tick_sizes[i] = 0;
-		}
-	}
-	layer_mark_dirty(ticks_canvas);
-}
-
-static void ticks_update_proc(Layer *layer, GContext *ctx) {
-	graphics_context_set_stroke_width(ctx, 3);
-	graphics_context_set_stroke_color(ctx, ticks_colour);
-
-	bool should_animate = battery_gauge_enabled && animation_is_scheduled(charging_animation);
-	// APP_LOG(APP_LOG_LEVEL_DEBUG, "redrawing ticks level %i, percentage %i", ticks_level, battery_state.charge_percent);
-
-	for (int i=0; i<num_ticks; i++) {
-		GPoint pos = tick_positions[i];
-		bool should_fill = (i < ticks_level);
-
-		if (should_fill) {
-			graphics_context_set_fill_color(ctx, ticks_colour);
-			if (!should_animate) {
-				graphics_fill_circle(ctx, pos, ticks_size);
-			} else {
-				graphics_fill_circle(ctx, pos, animating_tick_sizes[i]);
-			}
-		} else {
-			if (ticks_size > 1) { // leave blank when tick size too small
-				graphics_context_set_fill_color(ctx, bg_colour);
-				int ring_size = ticks_size;
-				if (ticks_size > 2) {
-					ring_size = ticks_size-1;
-				}
-				graphics_draw_circle(ctx, pos, ring_size);
-				graphics_fill_circle(ctx, pos, ring_size);
-			}
-		}
-	}
-}
 
 static void init_text_style(TextLayer *layer) {
 	GFont custom_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_POPPINS_16));
@@ -130,10 +51,7 @@ static void update_date_group_position(unsigned short hour) {
 	layer_set_frame(date_group_layer, frame);
 }
 
-void load_window(Window *window) {
-	window_layer = window_get_root_layer(window);
-	GRect bounds = layer_get_bounds(window_layer);
-
+static void init_text_layers(GRect bounds) {
 	// create day of week and date text layers
 	int line_height = 16;
 	int bottom = bounds.size.h / 2 - 3;
@@ -164,6 +82,29 @@ void load_window(Window *window) {
 	layer_add_child(date_group_layer, text_layer_get_layer(date_shadow_text_layer_b));
 	layer_add_child(date_group_layer, text_layer_get_layer(day_text_layer));
 	layer_add_child(date_group_layer, text_layer_get_layer(date_text_layer));
+}
+
+static enum HandShape enamel_to_hand_shape(HANDS_SHAPEValue enamel_value) {
+	switch (enamel_value) {
+		case HANDS_SHAPE_BAGUETTE:
+			return BAGUETTE;
+		case HANDS_SHAPE_PENCIL:
+			return PENCIL;
+		case HANDS_SHAPE_BREGUET:
+			return BREGUET;
+		case HANDS_SHAPE_SWISS_RAIL:
+			return SWISSRAIL;
+		default:
+		case HANDS_SHAPE_DAUPHINE:
+			return DAUPHINE;
+	}
+}
+
+void load_window(Window *window) {
+	window_layer = window_get_root_layer(window);
+	GRect bounds = layer_get_bounds(window_layer);
+
+	init_text_layers(bounds);
 
 	// create temperature gauge
 	temp_range_layer = layer_create(bounds);
@@ -171,9 +112,8 @@ void load_window(Window *window) {
 	init_weather(temp_range_layer, temp_now_layer);
 
 	// create ticks
-	ticks_canvas = layer_create(bounds);
-	init_tick_positions(ticks_canvas);
-	layer_set_update_proc(ticks_canvas, ticks_update_proc);
+	ticks_layer = layer_create(bounds);
+	init_ticks(ticks_layer);
 
 	// create big digits
 	digits_layer = layer_create(bounds);
@@ -186,7 +126,7 @@ void load_window(Window *window) {
 	// add layers, foreground last
 	layer_add_child(window_layer, temp_range_layer);
 	layer_add_child(window_layer, digits_layer);
-	layer_add_child(window_layer, ticks_canvas);
+	layer_add_child(window_layer, ticks_layer);
 	layer_add_child(window_layer, temp_now_layer);
 	layer_add_child(window_layer, hands_layer);
 	layer_add_child(window_layer, date_group_layer);
@@ -200,44 +140,22 @@ void update_style() {
 	bg_colour = enamel_get_BG_COLOUR();
 	set_digits_colour(enamel_get_TIME_COLOUR());
 	date_colour = enamel_get_DATE_COLOUR();
-	set_hour_hand_colour(enamel_get_HOUR_HAND_COLOUR());
-	set_minute_hand_colour(enamel_get_MINUTE_HAND_COLOUR());
-	ticks_colour = enamel_get_TICKS_COLOUR();
-	ticks_size = enamel_get_TICKS_SIZE();
+	update_hands_settings(
+		enamel_get_HOUR_HAND_COLOUR(),
+		enamel_get_MINUTE_HAND_COLOUR(),
+		enamel_to_hand_shape(enamel_get_hands_shape())
+	);
 
-	switch (enamel_get_hands_shape()) {
-		case HANDS_SHAPE_BAGUETTE: {
-			set_hands_shape(BAGUETTE);
-			break;
-		}
-		case HANDS_SHAPE_PENCIL: {
-			set_hands_shape(PENCIL);
-			break;
-		}
-		case HANDS_SHAPE_BREGUET: {
-			set_hands_shape(BREGUET);
-			break;
-		}
-		case HANDS_SHAPE_SWISS_RAIL: {
-			set_hands_shape(SWISSRAIL);
-			break;
-		}
-		default:
-		case HANDS_SHAPE_DAUPHINE: {
-			set_hands_shape(DAUPHINE);
-			break;
-		}
-	}
-
-	battery_gauge_enabled = enamel_get_BATTERY_GAUGE_ENABLED();
+	update_tick_settings(
+		enamel_get_TICKS_COLOUR(),
+		enamel_get_TICKS_SIZE(),
+		enamel_get_BATTERY_GAUGE_ENABLED()
+	);
 	enable_temp(enamel_get_TEMP_ENABLED());
 	check_temp_unit_change();
 	set_temp_range_colour(enamel_get_TEMP_RANGE_COLOUR());
 	set_temp_now_colour(enamel_get_TEMP_NOW_COLOUR());
 	
-	layer_mark_dirty(hands_layer);
-	update_battery_ticks(battery_state);
-
 	window_set_background_color(layer_get_window(window_layer), bg_colour);
 
 	text_layer_set_text_color(day_text_layer, date_colour);
@@ -266,34 +184,26 @@ void update_date_month(char *date) {
 	text_layer_set_text(date_shadow_text_layer_b, date);
 }
 
-void update_battery_ticks(BatteryChargeState charge_state) {
-	battery_state = charge_state;
+void destroy_layers() {
+	destroy_digits();
+	destroy_hands();
 
-	if (battery_gauge_enabled) {
-		ticks_level = battery_state.charge_percent*0.01*num_ticks;
-	} else {
-		ticks_level = num_ticks;
-	}
+	text_layer_destroy(day_text_layer);
+	text_layer_destroy(day_shadow_text_layer);
+	text_layer_destroy(date_text_layer);
+	text_layer_destroy(date_shadow_text_layer_a);
+	text_layer_destroy(date_shadow_text_layer_b);
 
-	layer_mark_dirty(ticks_canvas);
+	layer_destroy(digits_layer);
+	layer_destroy(ticks_layer);
+	layer_destroy(hands_layer);
+	layer_destroy(date_group_layer);
+	layer_destroy(temp_range_layer);
+	layer_destroy(temp_now_layer);
 }
 
-void animate_charging_indicator() {
-	if (charging_animation) {
-		// avoid double animation
-		animation_unschedule(charging_animation);
-		animation_destroy(charging_animation);
-	}
-	charging_animation = animation_create();
-	animation_set_duration(charging_animation, 1000);
-	animation_set_delay(charging_animation, 0);
-	animation_set_curve(charging_animation, AnimationCurveEaseInOut);
-	animation_implementation = (AnimationImplementation) {
-		.update = charging_animation_update
-	};
-	animation_set_implementation(charging_animation, &animation_implementation);
-	animation_schedule(charging_animation);
-}
+
+// Share helper functions
 
 GColor get_bg_colour() {
 	return bg_colour;
@@ -327,22 +237,4 @@ GPoint get_point_at_rect_perim(int angle, GRect frame) {
 
 		return GPoint(xEdge, center.y - leftRightSign*(frame.size.w/2)*cos_lookup(angle)/sin_lookup(angle));
 	}
-}
-
-void destroy_layers() {
-	destroy_digits();
-	destroy_hands();
-
-	text_layer_destroy(day_text_layer);
-	text_layer_destroy(day_shadow_text_layer);
-	text_layer_destroy(date_text_layer);
-	text_layer_destroy(date_shadow_text_layer_a);
-	text_layer_destroy(date_shadow_text_layer_b);
-
-	layer_destroy(digits_layer);
-	layer_destroy(ticks_canvas);
-	layer_destroy(hands_layer);
-	layer_destroy(date_group_layer);
-	layer_destroy(temp_range_layer);
-	layer_destroy(temp_now_layer);
 }

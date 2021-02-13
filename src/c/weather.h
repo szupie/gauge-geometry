@@ -1,4 +1,5 @@
 #pragma once
+#include <pebble.h>
 
 void init_weather(Layer *range_layer, Layer *now_layer);
 void set_temp_range_colour(GColor colour);

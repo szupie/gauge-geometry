@@ -1,4 +1,3 @@
-#include <pebble.h>
 #include "weather.h"
 #include "graphics.h"
 
@@ -66,6 +65,7 @@ static void temp_now_update_proc(Layer *layer, GContext *ctx) {
 	}
 }
 
+#if defined(PBL_RECT)
 static void fill_rect_gauge(GContext *ctx, GRect bounds, int thickness, GPoint start, GPoint end) {
 	// fill gauge from start clockwise to next corner until end is reached
 	int loop_counter = 0;
@@ -111,6 +111,7 @@ static void fill_rect_gauge(GContext *ctx, GRect bounds, int thickness, GPoint s
 		}
 	}
 }
+#endif
 
 static void temp_range_update_proc(Layer *layer, GContext *ctx) {
 	if (temp_range_defined && temp_range_colour_defined && temp_min < temp_max) {

@@ -18,8 +18,6 @@ void update_style();
 void update_time(unsigned short hour, unsigned short minute);
 void update_day_of_week(char *day);
 void update_date_month(char *date);
-void update_battery_ticks(BatteryChargeState charge_state);
-void animate_charging_indicator();
 GColor get_bg_colour();
 GPoint get_point_at_rect_perim(int angle, GRect frame);
 void destroy_layers();
