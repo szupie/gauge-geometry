@@ -30,38 +30,6 @@ static float h_component(int32_t angle) {
 	return cos_lookup(angle)/(float)TRIG_MAX_RATIO;
 }
 
-static void create_hand_paths(enum HandShape shape) {
-	destroy_hands();
-
-	switch (shape) {
-		case BAGUETTE: {
-			hour_path = gpath_create(&BAGUETTE_HOUR_POINTS);
-			minute_path = gpath_create(&BAGUETTE_MINUTE_POINTS);
-			break;
-		}
-		case PENCIL: {
-			hour_path = gpath_create(&PENCIL_HOUR_POINTS);
-			minute_path = gpath_create(&PENCIL_MINUTE_POINTS);
-			break;
-		}
-		case BREGUET: {
-			hour_path = gpath_create(&BREGUET_HOUR_POINTS);
-			minute_path = gpath_create(&BREGUET_MINUTE_POINTS);
-			break;
-		}
-		case SWISSRAIL: {
-			hour_path = gpath_create(&SWISSRAIL_HOUR_POINTS);
-			minute_path = gpath_create(&SWISSRAIL_MINUTE_POINTS);
-			break;
-		}
-		default:
-		case DAUPHINE: {
-			hour_path = gpath_create(&DAUPHINE_HOUR_POINTS);
-			minute_path = gpath_create(&DAUPHINE_MINUTE_POINTS);
-			break;
-		}
-	}
-}
 
 // Kickstarter style rounded hands
 // This style is more abstract and less physical. The hands fuse together
@@ -353,6 +321,38 @@ static void hands_update_proc(Layer *layer, GContext *ctx) {
 	}
 }
 
+static void create_hand_paths(enum HandShape shape) {
+	destroy_hands();
+
+	switch (shape) {
+		case BAGUETTE: {
+			hour_path = gpath_create(&BAGUETTE_HOUR_POINTS);
+			minute_path = gpath_create(&BAGUETTE_MINUTE_POINTS);
+			break;
+		}
+		case PENCIL: {
+			hour_path = gpath_create(&PENCIL_HOUR_POINTS);
+			minute_path = gpath_create(&PENCIL_MINUTE_POINTS);
+			break;
+		}
+		case BREGUET: {
+			hour_path = gpath_create(&BREGUET_HOUR_POINTS);
+			minute_path = gpath_create(&BREGUET_MINUTE_POINTS);
+			break;
+		}
+		case SWISSRAIL: {
+			hour_path = gpath_create(&SWISSRAIL_HOUR_POINTS);
+			minute_path = gpath_create(&SWISSRAIL_MINUTE_POINTS);
+			break;
+		}
+		default:
+		case DAUPHINE: {
+			hour_path = gpath_create(&DAUPHINE_HOUR_POINTS);
+			minute_path = gpath_create(&DAUPHINE_MINUTE_POINTS);
+			break;
+		}
+	}
+}
 static void set_hands_shape(enum HandShape shape) {
 	hand_shape = shape;
 

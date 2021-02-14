@@ -78,7 +78,7 @@
 			{
 				"type": "radiogroup",
 				"messageKey": "HANDS_SHAPE",
-				"label": "Hand type",
+				"label": "Hands shape",
 				"defaultValue": "0",
 				"id": "hands-shape",
 				"options": [
