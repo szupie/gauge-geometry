@@ -318,6 +318,17 @@ module.exports = function(minified) {
 		});
 	};
 
+
+	// Data
+
+	const handShapes = Object.freeze({
+		dauphine: '0',
+		pencil: '1',
+		baguette: '2',
+		breguet: '3',
+		swiss_rail: '4',
+	});
+
 	// Preset colour schemes
 	const themeSettings = {
 		classic: {
@@ -326,7 +337,7 @@ module.exports = function(minified) {
 			'DATE_COLOUR': '000055',
 			'HOUR_HAND_COLOUR': 'AA0000',
 			'MINUTE_HAND_COLOUR': '0055FF',
-			'HANDS_SHAPE': '0',
+			'HANDS_SHAPE': handShapes.dauphine,
 			'TICKS_COLOUR': '000055',
 			'TICKS_SIZE': '2',
 			'TEMP_NOW_COLOUR': 'AA0000',
@@ -338,7 +349,7 @@ module.exports = function(minified) {
 			'DATE_COLOUR': 'FFFFFF',
 			'HOUR_HAND_COLOUR': 'FF0000',
 			'MINUTE_HAND_COLOUR': 'FFFFFF',
-			'HANDS_SHAPE': '0',
+			'HANDS_SHAPE': handShapes.dauphine,
 			'TICKS_COLOUR': 'FFFFFF',
 			'TICKS_SIZE': '1',
 			'TEMP_NOW_COLOUR': 'AAAAAA',
@@ -350,7 +361,7 @@ module.exports = function(minified) {
 			'DATE_COLOUR': '555500',
 			'HOUR_HAND_COLOUR': '0055AA',
 			'MINUTE_HAND_COLOUR': '005555',
-			'HANDS_SHAPE': '1',
+			'HANDS_SHAPE': handShapes.pencil,
 			'TICKS_COLOUR': 'AAAA00',
 			'TICKS_SIZE': '2',
 			'TEMP_NOW_COLOUR': '0055AA',
@@ -362,7 +373,7 @@ module.exports = function(minified) {
 			'DATE_COLOUR': '0055AA',
 			'HOUR_HAND_COLOUR': '0055AA',
 			'MINUTE_HAND_COLOUR': '0055AA',
-			'HANDS_SHAPE': '1',
+			'HANDS_SHAPE': handShapes.pencil,
 			'TICKS_COLOUR': '0055AA',
 			'TICKS_SIZE': '2',
 			'TEMP_NOW_COLOUR': 'FF0055',
@@ -372,9 +383,9 @@ module.exports = function(minified) {
 			'BG_COLOUR': '550055',
 			'TIME_COLOUR': 'FFFFFF',
 			'DATE_COLOUR': 'FFAAFF',
-			'HOUR_HAND_COLOUR': '0055FF',
+			'HOUR_HAND_COLOUR': '00AAFF',
 			'MINUTE_HAND_COLOUR': 'FF00AA',
-			'HANDS_SHAPE': '2',
+			'HANDS_SHAPE': handShapes.baguette,
 			'TICKS_COLOUR': 'FFAAFF',
 			'TICKS_SIZE': '3',
 			'TEMP_NOW_COLOUR': '5555FF',
@@ -386,7 +397,7 @@ module.exports = function(minified) {
 			'DATE_COLOUR': 'FFFFFF',
 			'HOUR_HAND_COLOUR': 'FFAAFF',
 			'MINUTE_HAND_COLOUR': 'FFAAFF',
-			'HANDS_SHAPE': '3',
+			'HANDS_SHAPE': handShapes.breguet,
 			'TICKS_COLOUR': 'FFFFFF',
 			'TICKS_SIZE': '2',
 			'TEMP_NOW_COLOUR': 'FFAAFF',
@@ -398,7 +409,7 @@ module.exports = function(minified) {
 			'DATE_COLOUR': 'FFFFFF',
 			'HOUR_HAND_COLOUR': 'FF0000',
 			'MINUTE_HAND_COLOUR': 'FF0000',
-			'HANDS_SHAPE': '4',
+			'HANDS_SHAPE': handShapes.swiss_rail,
 			'TICKS_COLOUR': 'FFFFFF',
 			'TICKS_SIZE': '2',
 			'TEMP_NOW_COLOUR': 'FFFFFF',
@@ -410,7 +421,7 @@ module.exports = function(minified) {
 			'DATE_COLOUR': 'AAAA00',
 			'HOUR_HAND_COLOUR': 'FFFF55',
 			'MINUTE_HAND_COLOUR': 'FFFF55',
-			'HANDS_SHAPE': '1',
+			'HANDS_SHAPE': handShapes.pencil,
 			'TICKS_COLOUR': 'AAAA00',
 			'TICKS_SIZE': '1',
 			'TEMP_NOW_COLOUR': 'FFFF00',

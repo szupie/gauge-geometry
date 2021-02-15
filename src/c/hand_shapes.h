@@ -75,6 +75,7 @@ static const int SWISSRAIL_THICKNESS = 3;
 static const int SWISSRAIL_HOUR_RADIUS = 7;
 static const int SWISSRAIL_MINUTE_RADIUS = 6;
 static const int SWISSRAIL_AXLE_RADIUS = 3;
+#if defined(PBL_ROUND)
 static const GPathInfo SWISSRAIL_HOUR_POINTS = {
 	2, (GPoint []){
 		{0, 18},
@@ -87,3 +88,17 @@ static const GPathInfo SWISSRAIL_MINUTE_POINTS = {
 		{0, -70}
 	}
 };
+#elif defined(PBL_RECT)
+static const GPathInfo SWISSRAIL_HOUR_POINTS = {
+	2, (GPoint []){
+		{0, 16},
+		{0, -35}
+	}
+};
+static const GPathInfo SWISSRAIL_MINUTE_POINTS = {
+	2, (GPoint []){
+		{0, 18},
+		{0, -66}
+	}
+};
+#endif
