@@ -1,3 +1,4 @@
+#pragma once
 #include <pebble.h>
 
 enum HandShape { DAUPHINE, BAGUETTE, PENCIL, BREGUET, SWISSRAIL };
@@ -21,84 +22,38 @@ static const GPathInfo DAUPHINE_MINUTE_POINTS = {
 	}
 };
 
-static const int BAGUETTE_THICKNESS = 7;
-static const GPathInfo BAGUETTE_HOUR_POINTS = {
-	2, (GPoint []){
-		{0, 0},
-		{0, -46}
-	}
-};
-static const GPathInfo BAGUETTE_MINUTE_POINTS = {
-	2, (GPoint []){
-		{0, 0},
-		{0, -70}
-	}
-};
+#define BAGUETTE_THICKNESS 7
+#define BAGUETTE_HOUR_LENGTH 46
+#define BAGUETTE_MINUTE_LENGTH 70
 
-static const float PENCIL_SHARPNESS = 4.2;
-static const int PENCIL_THICKNESS = 5;
-static const int PENCIL_AXLE_RADIUS = 6;
-static const GPathInfo PENCIL_HOUR_POINTS = {
-	2, (GPoint []){
-		{0, 0},
-		{0, -40}
-	}
-};
-static const GPathInfo PENCIL_MINUTE_POINTS = {
-	2, (GPoint []){
-		{0, 0},
-		{0, -65}
-	}
-};
+#define PENCIL_SHARPNESS 4.2
+#define PENCIL_THICKNESS 5
+#define PENCIL_HOUR_LENGTH 40
+#define PENCIL_MINUTE_LENGTH 65
+#define PENCIL_AXLE_RADIUS 6
 
-static const int BREGUET_THICKNESS = 5;
-static const int BREGUET_HOUR_RADIUS = 7;
-static const int BREGUET_MINUTE_RADIUS = 6;
-static const int BREGUET_EYE_THICKNESS = 3;
-static const int BREGUET_AXLE_RADIUS = 5;
-static const int BREGUET_HOUR_EYE_DIST = 31;
-static const int BREGUET_MINUTE_EYE_DIST = 65;
-static const GPathInfo BREGUET_HOUR_POINTS = {
-	2, (GPoint []){
-		{0, 0},
-		{0, -50}
-	}
-};
-static const GPathInfo BREGUET_MINUTE_POINTS = {
-	2, (GPoint []){
-		{0, 0},
-		{0, -85}
-	}
-};
+#define BREGUET_THICKNESS 5
+#define BREGUET_HOUR_LENGTH 50
+#define BREGUET_MINUTE_LENGTH 85
+#define BREGUET_HOUR_RADIUS 7
+#define BREGUET_MINUTE_RADIUS 6
+#define BREGUET_EYE_THICKNESS 3
+#define BREGUET_AXLE_RADIUS 5
+#define BREGUET_HOUR_EYE_DIST 31
+#define BREGUET_MINUTE_EYE_DIST 65
 
-static const int SWISSRAIL_THICKNESS = 3;
-static const int SWISSRAIL_HOUR_RADIUS = 7;
-static const int SWISSRAIL_MINUTE_RADIUS = 6;
-static const int SWISSRAIL_AXLE_RADIUS = 3;
+#define SWISSRAIL_THICKNESS 3
+#define SWISSRAIL_HOUR_RADIUS 7
+#define SWISSRAIL_MINUTE_RADIUS 6
+#define SWISSRAIL_AXLE_RADIUS 3
 #if defined(PBL_ROUND)
-static const GPathInfo SWISSRAIL_HOUR_POINTS = {
-	2, (GPoint []){
-		{0, 18},
-		{0, -37}
-	}
-};
-static const GPathInfo SWISSRAIL_MINUTE_POINTS = {
-	2, (GPoint []){
-		{0, 20},
-		{0, -70}
-	}
-};
+#define SWISSRAIL_HOUR_LENGTH 37
+#define SWISSRAIL_MINUTE_LENGTH 70
+#define SWISSRAIL_HOUR_EXTENDER_LENGTH 18
+#define SWISSRAIL_MINUTE_EXTENDER_LENGTH 20
 #elif defined(PBL_RECT)
-static const GPathInfo SWISSRAIL_HOUR_POINTS = {
-	2, (GPoint []){
-		{0, 16},
-		{0, -35}
-	}
-};
-static const GPathInfo SWISSRAIL_MINUTE_POINTS = {
-	2, (GPoint []){
-		{0, 18},
-		{0, -66}
-	}
-};
+#define SWISSRAIL_HOUR_LENGTH 35
+#define SWISSRAIL_MINUTE_LENGTH 66
+#define SWISSRAIL_HOUR_EXTENDER_LENGTH 16
+#define SWISSRAIL_MINUTE_EXTENDER_LENGTH 18
 #endif
