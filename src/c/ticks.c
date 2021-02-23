@@ -18,7 +18,22 @@ static int animating_tick_sizes[num_ticks];
 
 
 static int min(int a, int b) {
-    return a < b ? a : b;
+	return a < b ? a : b;
+}
+
+static float clamp(float x, float min, float max) {
+	if (x<min) return min;
+	else if (x>max) return max;
+	else return x;
+}
+
+// based on https://easings.net/#easeOutBack
+static float easeOutBack(float percentage) {
+	float c1 = 6;
+	float c3 = c1 + 1;
+	float x = percentage-1;
+
+	return 1 + c3 * x*x*x + c1 * x*x;
 }
 
 static void calculate_tick_positions(Layer *layer) {
@@ -28,7 +43,9 @@ static void calculate_tick_positions(Layer *layer) {
 		int hour_angle = DEG_TO_TRIGANGLE(i*360/num_ticks);
 
 		#if defined(PBL_ROUND)
-		tick_positions[i] = gpoint_from_polar(insetRect, GOvalScaleModeFitCircle, hour_angle);
+		tick_positions[i] = gpoint_from_polar(
+			insetRect, GOvalScaleModeFitCircle, hour_angle
+		);
 		#elif defined(PBL_RECT)
 		tick_positions[i] = get_point_at_rect_perim(hour_angle, insetRect);
 		#endif
@@ -36,12 +53,20 @@ static void calculate_tick_positions(Layer *layer) {
 }
 
 static void charging_animation_update(Animation *animation, const AnimationProgress progress) {
-	float staggerness = 4.6;
-	float staggered_percent = (staggerness+1)*progress/ANIMATION_NORMALIZED_MAX;
+	float staggerness = 4.6; // higher for more delay between each tick
+	float progress_percent = (float)progress/ANIMATION_NORMALIZED_MAX;
 	for (int i=0; i<num_ticks; i++) {
 		if (i < ticks_level) {
-			float tick_percent = staggered_percent-staggerness*i/(num_ticks-1);
-			animating_tick_sizes[i] = min(ticks_size, ticks_size*tick_percent);
+			float percent_at_tick = (float)i/(ticks_level-1);
+			float tick_percent = clamp(
+				(staggerness+1)*progress_percent - staggerness*percent_at_tick,
+				0, 1
+			);
+			// besides easing timing between ticks, also ease tick scaling
+			float eased_tick_scale = easeOutBack(tick_percent);
+			animating_tick_sizes[i] = min(
+				ticks_size+1, ticks_size*eased_tick_scale
+			);
 		} else {
 			animating_tick_sizes[i] = 0;
 		}
@@ -101,11 +126,10 @@ void update_battery_ticks(BatteryChargeState charge_state) {
 }
 
 void animate_charging_indicator() {
-	if (charging_animation) {
-		// avoid double animation
-		animation_unschedule(charging_animation);
-		animation_destroy(charging_animation);
-	}
+	// avoid double animation
+	animation_unschedule(charging_animation);
+	animation_destroy(charging_animation);
+
 	charging_animation = animation_create();
 	animation_set_duration(charging_animation, 1000);
 	animation_set_delay(charging_animation, 0);
