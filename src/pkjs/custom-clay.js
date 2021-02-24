@@ -5,8 +5,13 @@ module.exports = function(minified) {
 	var HTML = minified.HTML;
 
 	clayConfig.on(clayConfig.EVENTS.AFTER_BUILD, function() {
-		$('head').add(HTML('<style type="text/css" id="config-style"></style>'));
 
+		// Global CSS
+		$('head').add(HTML('<style type="text/css" id="config-style"></style>'));
+		$('#config-style').add(cssCode);
+
+
+		// ==== Save button style ====
 		clayConfig.getItemById('save-button').$element.set({
 			$position: 'sticky',
 			$bottom: '0',
@@ -14,74 +19,19 @@ module.exports = function(minified) {
 			$zIndex: 3
 		});
 
-		// Themes
-		$('#config-style').add(
-			'#presetThemes {'+
-				'text-align: center;'+
-				'padding-top: 0.7rem;'+
-			'}'+
-			'.accordion:not(.shown) + .component {'+
-				'max-height: 3rem;'+
-			'}'+
-			'.accordion + .component::before {'+
-				'content: "";'+
-				'position: absolute;'+
-				'top: 0;'+
-				'bottom: 0;'+
-				'left: 0;'+
-				'right: 0;'+
-				'background: linear-gradient(rgba(72, 72, 72, 0), rgba(72, 72, 72, 1));'+
-				'transition: opacity ease-out 200ms;'+
-			'}'+
-			'.accordion.shown + .component::before {'+
-				'pointer-events: none;'+
-				'opacity: 0;'+
-			'}'+
-			'.accordion + .component {'+
-				'overflow: hidden;'+
-				'max-height: 100vh;'+
-				'transition-property: max-height, padding-top, padding-bottom;'+
-				'transition-timing-function: ease-out;'+
-				'transition-duration: 200ms;'+
-			'}'+
-			'.accordion-label::after {'+
-				'content: "▾";'+
-				'margin-left: 0.5rem;'+
-				'display: inline-block;'+
-				'transition: transform ease-out 200ms;'+
-			'}'+
-			'.accordion.shown .accordion-label::after {'+
-				'transform: translateY(-10%) rotate(-180deg);'+
-			'}'+
-			'#presetThemes [data-theme-id] {'+
-				'min-width: 0;'+
-				'width: 5em;'+
-				'margin-left: 0.5em;'+
-				'margin-right: 0.5em;'+
-				'vertical-align: bottom;'+
-				'padding: 0;'+
-				'background: none;'+
-				'font-size: .8rem;'+
-				'line-height: 1em; '+
-				'color: #a4a4a4; '+
-			'}'+
-			'#presetThemes [data-theme-id] img {'+
-				'max-width: 100%;'+
-				'margin-top: 0.3rem;	'+
-				'box-shadow: 0 0 0 2pt #414141;'+
-				'border-radius: 50%;'+
-			'}'+
-			'#presetThemes.rect [data-theme-id] img {'+
-				'border-radius: 0;'+
-			'}'
-		);
+
+		// ==== Themes section ====
 		const themesAccordion = clayConfig.getItemById('themes-accordion').$element;
+
+		// Accordionify
 		themesAccordion[0].classList.add('accordion')
 		function toggleThemeAccordion() {
 			themesAccordion[0].classList.toggle('shown');
 		}
 		themesAccordion.on('click', toggleThemeAccordion);
 		$(themesAccordion[0].nextSibling).on('click', toggleThemeAccordion);
+
+		// Add image for each option and wire up to preset data
 		$('[data-theme-id]').each(function (item) {
 			const themeId = item.getAttribute('data-theme-id');
 			$(item).add(HTML('<img src="data:image/png;base64,'+screenshots[themeId]+'"/>'));
@@ -89,7 +39,20 @@ module.exports = function(minified) {
 				applyThemeSettings(themeSettings[themeId]);
 			});
 		});
+		
 
+		// ==== Hands shape ====
+		// Replace hand shape option text labels with images
+		const handsShapeSection = clayConfig.getItemById('hands-shape').$element;
+		handsShapeSection.set('id', 'hands-shape');
+		$('label .label', handsShapeSection).each(function (item) {
+			item.innerHTML = '<svg width="180" height="20">'+
+				handSVGs[item.textContent]+
+				'</svg>';
+		});
+
+
+		// ==== Ticks ====
 		// Add notch marks to slider input to make sizing increments clearer
 		const ticksSizeInput = $('input.slider', clayConfig.getItemByMessageKey('TICKS_SIZE').$element);
 		const sliderCount = ticksSizeInput.get('@max');
@@ -100,34 +63,8 @@ module.exports = function(minified) {
 			$backgroundRepeat: 'no-repeat'
 		});
 
-		// Style subsection headings
-		$('#config-style').add(
-			'.component-heading:not(:first-child) {'+
-				'padding-bottom: 0.5rem;'+
-			'}'+
-			'.component-heading:not(:first-child) h6 { '+
-				'color: #a4a4a4; '+
-				'text-transform: uppercase;'+
-			'}'+
-			':not(.component-heading) + .component-heading h6 {'+
-				'margin-top: 2rem;'+
-			'}'
-		);
 
-		const handsShapeSection = clayConfig.getItemById('hands-shape').$element;
-		handsShapeSection.set('id', 'hands-shape');
-		$('label .label', handsShapeSection).each(function (item) {
-			item.innerHTML = '<svg width="180" height="20">'+
-				handSVGs[item.textContent]+
-				'</svg>';
-		});
-		$('#config-style').add(
-			'#hands-shape .label > svg {'+
-				"margin-left: -70px;"+
-				"transform: scale(0.9);"+
-				"opacity: 0.8;"+
-			'}'
-		);
+		// ==== Weather ====
 
 		// Weather request can only be triggered on save, 
 		// so make button toggle hidden setting that gets reset every time
@@ -150,12 +87,9 @@ module.exports = function(minified) {
 
 		// Style explanation for temperature dial
 		const tempUnitInput = clayConfig.getItemByMessageKey('TEMP_UNIT');
-		const dialDiameter = 7;
-		const markerThickness = 5;
 
 		const tempCurrentColourInput = clayConfig.getItemByMessageKey('TEMP_NOW_COLOUR');
 		const tempRangeColourInput = clayConfig.getItemByMessageKey('TEMP_RANGE_COLOUR');
-		const currentIndicatorDiameter = 12;
 
 		$('.description', tempUnitInput.$element).set({
 			$display: 'flex',
@@ -163,66 +97,6 @@ module.exports = function(minified) {
 			$justifyContent: 'center',
 			$alignItems: 'center'
 		});
-
-		$('#config-style').add(
-			'#temp_dial {'+
-				'height: '+dialDiameter+'rem;'+
-				'width: '+dialDiameter+'rem;'+
-				'background-color: #666;'+
-				'border-radius: 100%;'+
-				'position: relative;'+
-			'}'+
-			'#temp_dial .indicator.current {'+
-				'height: '+currentIndicatorDiameter+'px;'+
-				'width: '+currentIndicatorDiameter+'px;'+
-				'background-color: #666;'+
-				'border: 4px solid transparent;'+
-				'border-radius: 100%;'+
-				'position: absolute;'+
-				'left: calc(50% - '+currentIndicatorDiameter/2+'px);'+
-				'margin-top: -2px;'+
-				'transform-origin: '+currentIndicatorDiameter/2+'px calc('+dialDiameter/2+'rem + 2px);'+
-				'z-index: 1;'+
-			'}'+
-			'#temp_dial .indicator.range {'+
-				'height: '+dialDiameter+'rem;'+
-				'width: '+dialDiameter+'rem;'+
-				'border-width: 6px;'+
-				'border-style: solid;'+
-				'border-radius: 100%;'+
-				'position: absolute;'+
-				'clip-path: polygon(50% 0, 50% 50%, 136% 0);'+
-			'}'+
-			'#temp_dial .markers .tick {'+
-				'position: absolute;'+
-				'padding-top: 0.1em;'+
-				'height: '+dialDiameter+'rem;'+
-				'width: 1px;'+
-				'left: calc(50% + 2px - '+markerThickness+'px / 2);'+
-				'border-top: '+markerThickness+'px solid currentcolor;'+
-				'opacity: 0.8;'+
-				'font-size: 0.75rem;'+
-				'z-index: 2;'+
-			'}'+
-			'#temp_dial .markers .tick .label {'+
-				'display: inline-block;'+
-				'margin: auto;'+
-			'}'+
-			'#temp_sample {'+
-				'margin-left: 0.75rem;'+
-				'font-size: 0.75rem;'+
-				'line-height: 1.5em;'+
-				'opacity: 0.6;'+
-			'}'+
-			'#temp_sample h6 {'+
-				'text-transform: uppercase;'+
-				'line-height: inherit;'+
-			'}'+
-			'#temp_explain {'+
-				'flex: 1 0 100%;'+
-				'margin-top: 1rem;'+
-			'}'
-		);
 
 		function numToHexColour(num) {
 			return num.toString(16).padStart(6, "0");
@@ -322,7 +196,153 @@ module.exports = function(minified) {
 	};
 
 
-	// Data
+	// ==== CSS ====
+	const dialDiameter = 7;
+	const markerThickness = 5;
+	const currentIndicatorDiameter = 12;
+
+	const cssCode =
+
+		// subsection headings
+		'.component-heading:not(:first-child) {'+
+			'padding-bottom: 0.5rem;'+
+		'}'+
+		'.component-heading:not(:first-child) h6 { '+
+			'color: #a4a4a4; '+
+			'text-transform: uppercase;'+
+		'}'+
+		':not(.component-heading) + .component-heading h6 {'+
+			'margin-top: 2rem;'+
+		'}'+
+
+		// themes section
+		'#presetThemes {'+
+			'text-align: center;'+
+			'padding-top: 0.7rem;'+
+		'}'+
+		'.accordion:not(.shown) + .component {'+
+			'max-height: 3rem;'+
+		'}'+
+		'.accordion + .component::before {'+
+			'content: "";'+
+			'position: absolute;'+
+			'top: 0;'+
+			'bottom: 0;'+
+			'left: 0;'+
+			'right: 0;'+
+			'background: linear-gradient(rgba(72, 72, 72, 0), rgba(72, 72, 72, 1));'+
+			'transition: opacity ease-out 200ms;'+
+		'}'+
+		'.accordion.shown + .component::before {'+
+			'pointer-events: none;'+
+			'opacity: 0;'+
+		'}'+
+		'.accordion + .component {'+
+			'overflow: hidden;'+
+			'max-height: 100vh;'+
+			'transition-property: max-height, padding-top, padding-bottom;'+
+			'transition-timing-function: ease-out;'+
+			'transition-duration: 200ms;'+
+		'}'+
+		'.accordion-label::after {'+
+			'content: "▾";'+
+			'margin-left: 0.5rem;'+
+			'display: inline-block;'+
+			'transition: transform ease-out 200ms;'+
+		'}'+
+		'.accordion.shown .accordion-label::after {'+
+			'transform: translateY(-10%) rotate(-180deg);'+
+		'}'+
+		'#presetThemes [data-theme-id] {'+
+			'min-width: 0;'+
+			'width: 5em;'+
+			'margin-left: 0.5em;'+
+			'margin-right: 0.5em;'+
+			'vertical-align: bottom;'+
+			'padding: 0;'+
+			'background: none;'+
+			'font-size: .8rem;'+
+			'line-height: 1em; '+
+			'color: #a4a4a4; '+
+		'}'+
+		'#presetThemes [data-theme-id] img {'+
+			'max-width: 100%;'+
+			'margin-top: 0.3rem;	'+
+			'box-shadow: 0 0 0 2pt #414141;'+
+			'border-radius: 50%;'+
+		'}'+
+		'#presetThemes.rect [data-theme-id] img {'+
+			'border-radius: 0;'+
+		'}'+
+
+		// hands shape
+		'#hands-shape .label > svg {'+
+			"margin-left: -70px;"+
+			"transform: scale(0.9);"+
+			"opacity: 0.8;"+
+		'}'+
+
+		// temperature preview
+		'#temp_dial {'+
+			'height: '+dialDiameter+'rem;'+
+			'width: '+dialDiameter+'rem;'+
+			'background-color: #666;'+
+			'border-radius: 100%;'+
+			'position: relative;'+
+		'}'+
+		'#temp_dial .indicator.current {'+
+			'height: '+currentIndicatorDiameter+'px;'+
+			'width: '+currentIndicatorDiameter+'px;'+
+			'background-color: #666;'+
+			'border: 4px solid transparent;'+
+			'border-radius: 100%;'+
+			'position: absolute;'+
+			'left: calc(50% - '+currentIndicatorDiameter/2+'px);'+
+			'margin-top: -2px;'+
+			'transform-origin: '+currentIndicatorDiameter/2+'px calc('+dialDiameter/2+'rem + 2px);'+
+			'z-index: 1;'+
+		'}'+
+		'#temp_dial .indicator.range {'+
+			'height: '+dialDiameter+'rem;'+
+			'width: '+dialDiameter+'rem;'+
+			'border-width: 6px;'+
+			'border-style: solid;'+
+			'border-radius: 100%;'+
+			'position: absolute;'+
+			'clip-path: polygon(50% 0, 50% 50%, 136% 0);'+
+		'}'+
+		'#temp_dial .markers .tick {'+
+			'position: absolute;'+
+			'padding-top: 0.1em;'+
+			'height: '+dialDiameter+'rem;'+
+			'width: 1px;'+
+			'left: calc(50% + 2px - '+markerThickness+'px / 2);'+
+			'border-top: '+markerThickness+'px solid currentcolor;'+
+			'opacity: 0.8;'+
+			'font-size: 0.75rem;'+
+			'z-index: 2;'+
+		'}'+
+		'#temp_dial .markers .tick .label {'+
+			'display: inline-block;'+
+			'margin: auto;'+
+		'}'+
+		'#temp_sample {'+
+			'margin-left: 0.75rem;'+
+			'font-size: 0.75rem;'+
+			'line-height: 1.5em;'+
+			'opacity: 0.6;'+
+		'}'+
+		'#temp_sample h6 {'+
+			'text-transform: uppercase;'+
+			'line-height: inherit;'+
+		'}'+
+		'#temp_explain {'+
+			'flex: 1 0 100%;'+
+			'margin-top: 1rem;'+
+		'}';
+
+
+	// ==== Data ====
 
 	const handShapes = Object.freeze({
 		dauphine: '0',
