@@ -16,7 +16,7 @@
 			},
 			{
 				"type": "text",
-				"defaultValue": "<section id='presetThemes'><button data-theme-id='classic'>Classic</button><button data-theme-id='nautical'>Nautical</button><button data-theme-id='gold'>Gold</button><button data-theme-id='rose'>Rose</button><button data-theme-id='purple'>Purple</button><button data-theme-id='red'>Red</button><button data-theme-id='black'>Black</button><button data-theme-id='platinum'>Platinum</button></section>"
+				"defaultValue": "<section id='presetThemes'><button data-theme-id='classic'>Classic</button><button data-theme-id='nautical'>Nautical</button><button data-theme-id='gold'>Gold</button><button data-theme-id='rose'>Rose</button><button data-theme-id='purple'>Purple</button><button data-theme-id='salmon'>Artic Salmon</button><button data-theme-id='red'>Red</button><button data-theme-id='blackgold'>Black Gold</button></section>"
 			}
 		]
 	},
@@ -53,7 +53,7 @@
 				"type": "color",
 				"messageKey": "TIME_COLOUR",
 				"defaultValue": "000000",
-				"label": "Digital time"
+				"label": "Time (Digital)"
 			},
 			{
 				"type": "color",
