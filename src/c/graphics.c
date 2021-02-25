@@ -160,9 +160,10 @@ void update_style() {
 
 	text_layer_set_text_color(day_text_layer, date_colour);
 	text_layer_set_text_color(date_text_layer, date_colour);
-	text_layer_set_text_color(day_shadow_text_layer, bg_colour);
-	text_layer_set_text_color(date_shadow_text_layer_a, bg_colour);
-	text_layer_set_text_color(date_shadow_text_layer_b, bg_colour);
+	GColor date_shadow = get_stroke_colour_for_fill(date_colour);
+	text_layer_set_text_color(day_shadow_text_layer, date_shadow);
+	text_layer_set_text_color(date_shadow_text_layer_a, date_shadow);
+	text_layer_set_text_color(date_shadow_text_layer_b, date_shadow);
 }
 
 void update_time(unsigned short hour, unsigned short minute) {
@@ -207,6 +208,15 @@ void destroy_layers() {
 
 GColor get_bg_colour() {
 	return bg_colour;
+}
+
+// Use bg colour as stroke on colour displays. Otherwise get legible colour
+GColor get_stroke_colour_for_fill(GColor fill) {
+	#ifdef PBL_COLOR
+	return get_bg_colour();
+	#else
+	return gcolor_legible_over(fill);
+	#endif
 }
 
 GPoint get_point_at_rect_perim(int angle, GRect frame) {

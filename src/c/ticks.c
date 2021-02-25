@@ -76,7 +76,6 @@ static void charging_animation_update(Animation *animation, const AnimationProgr
 
 static void ticks_update_proc(Layer *layer, GContext *ctx) {
 	graphics_context_set_stroke_width(ctx, 3);
-	graphics_context_set_stroke_color(ctx, ticks_colour);
 
 	bool should_animate = battery_gauge_enabled && animation_is_scheduled(charging_animation);
 	// APP_LOG(APP_LOG_LEVEL_DEBUG, "redrawing ticks level %i, percentage %i", ticks_level, battery_state.charge_percent);
@@ -94,12 +93,13 @@ static void ticks_update_proc(Layer *layer, GContext *ctx) {
 			}
 		} else {
 			if (ticks_size > 1) { // leave blank when tick size too small
-				graphics_context_set_fill_color(ctx, get_bg_colour());
 				int ring_size = ticks_size;
 				if (ticks_size > 2) {
 					ring_size = ticks_size-1;
 				}
-				graphics_draw_circle(ctx, pos, ring_size);
+				graphics_context_set_fill_color(ctx, ticks_colour);
+				graphics_fill_circle(ctx, pos, ring_size+1);
+				graphics_context_set_fill_color(ctx, get_bg_colour());
 				graphics_fill_circle(ctx, pos, ring_size);
 			}
 		}

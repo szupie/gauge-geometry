@@ -57,11 +57,10 @@ static void temp_now_update_proc(Layer *layer, GContext *ctx) {
 		GPoint pos = get_point_at_rect_perim(temp_angle, insetRect);
 		#endif
 
-		graphics_context_set_fill_color(ctx, get_bg_colour());
-		graphics_context_set_stroke_color(ctx, temp_now_colour);
-		graphics_context_set_stroke_width(ctx, TEMP_NOW_STROKE);
+		graphics_context_set_fill_color(ctx, temp_now_colour);
 		graphics_fill_circle(ctx, pos, TEMP_NOW_RADIUS);
-		graphics_draw_circle(ctx, pos, TEMP_NOW_RADIUS);
+		graphics_context_set_fill_color(ctx, get_bg_colour());
+		graphics_fill_circle(ctx, pos, TEMP_NOW_RADIUS-TEMP_NOW_STROKE);
 	}
 }
 
