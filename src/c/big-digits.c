@@ -110,14 +110,23 @@ void init_digits(Layer *parent_layer) {
 	GRect window_bounds = layer_get_bounds(parent_layer);
 	GRect tile_bounds = gbitmap_get_bounds(bitmaps[0]);
 
+	// spacing for emery
+	#if PBL_DISPLAY_HEIGHT > 180
+	const int tracking = -2;
+	const int leading = EMERY_LEADING;
+	#else
+
 	const int tracking = -5;
+	const int leading = 0;
+	#endif
+
 	const int x_offset = window_bounds.size.w/2 - (tile_bounds.size.w + tracking/2);
-	const int y_offset = window_bounds.size.h/2 - tile_bounds.size.h;
+	const int y_offset = (window_bounds.size.h-leading)/2 - tile_bounds.size.h;
 
 	for (int slot_number=0; slot_number<TOTAL_TIME_DIGITS; slot_number++) {
 		GRect frame = GRect(
 			x_offset + ((slot_number % 2) * (tile_bounds.size.w + tracking)),
-			y_offset + ((slot_number / 2) * tile_bounds.size.h),
+			y_offset + ((slot_number / 2) * (tile_bounds.size.h + leading)),
 			tile_bounds.size.w, 
 			tile_bounds.size.h
 		);

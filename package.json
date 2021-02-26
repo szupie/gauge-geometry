@@ -20,7 +20,8 @@
 			"chalk",
 			"basalt",
 			"aplite",
-			"diorite"
+			"diorite",
+			"emery"
 		],
 		"watchapp": {
 			"watchface": true
@@ -64,7 +65,8 @@
 					"file": "century-gothic/0.png",
 					"targetPlatforms": [
 						"basalt",
-						"chalk"
+						"chalk",
+						"emery"
 					]
 				},
 				{
@@ -73,7 +75,8 @@
 					"file": "century-gothic/1.png",
 					"targetPlatforms": [
 						"basalt",
-						"chalk"
+						"chalk",
+						"emery"
 					]
 				},
 				{
@@ -82,7 +85,8 @@
 					"file": "century-gothic/2.png",
 					"targetPlatforms": [
 						"basalt",
-						"chalk"
+						"chalk",
+						"emery"
 					]
 				},
 				{
@@ -91,7 +95,8 @@
 					"file": "century-gothic/3.png",
 					"targetPlatforms": [
 						"basalt",
-						"chalk"
+						"chalk",
+						"emery"
 					]
 				},
 				{
@@ -100,7 +105,8 @@
 					"file": "century-gothic/4.png",
 					"targetPlatforms": [
 						"basalt",
-						"chalk"
+						"chalk",
+						"emery"
 					]
 				},
 				{
@@ -109,7 +115,8 @@
 					"file": "century-gothic/5.png",
 					"targetPlatforms": [
 						"basalt",
-						"chalk"
+						"chalk",
+						"emery"
 					]
 				},
 				{
@@ -118,7 +125,8 @@
 					"file": "century-gothic/6.png",
 					"targetPlatforms": [
 						"basalt",
-						"chalk"
+						"chalk",
+						"emery"
 					]
 				},
 				{
@@ -127,7 +135,8 @@
 					"file": "century-gothic/7.png",
 					"targetPlatforms": [
 						"basalt",
-						"chalk"
+						"chalk",
+						"emery"
 					]
 				},
 				{
@@ -136,7 +145,8 @@
 					"file": "century-gothic/8.png",
 					"targetPlatforms": [
 						"basalt",
-						"chalk"
+						"chalk",
+						"emery"
 					]
 				},
 				{
@@ -145,7 +155,8 @@
 					"file": "century-gothic/9.png",
 					"targetPlatforms": [
 						"basalt",
-						"chalk"
+						"chalk",
+						"emery"
 					]
 				},
 				{

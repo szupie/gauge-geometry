@@ -168,7 +168,7 @@ static void main_window_load(Window *window) {
 		update_date_month("11\nNov");
 		#endif
 
-	update_battery_ticks((BatteryChargeState){70, false, false});
+	update_battery_ticks((BatteryChargeState){80, false, false});
 
 	enable_temp(true);
 	update_temp_range(15, 25);

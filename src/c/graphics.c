@@ -40,12 +40,14 @@ static void update_date_group_position(unsigned short hour) {
 	} else {
 		frame.origin.x = left;
 	}
-	#elif defined(PBL_RECT)
+	#elif PBL_DISPLAY_WIDTH < 180
 	if (hour >= 10) {
 		frame.origin.x = 8;
 	} else {
 		frame.origin.x = 15;
 	}
+	#elif PBL_DISPLAY_WIDTH > 190
+	frame.origin.x = 15;
 	#endif
 
 	layer_set_frame(date_group_layer, frame);
@@ -60,6 +62,10 @@ static void init_text_layers(GRect bounds) {
 	int top = bottom - (line_height*2);
 	#elif defined(PBL_RECT)
 	int top = bottom - (line_height*3);
+	#endif
+
+	#if PBL_DISPLAY_HEIGHT > 180
+	top -= EMERY_LEADING / 2;
 	#endif
 
 	date_group_layer = layer_create(GRect(0, top, width, line_height*3.5));
