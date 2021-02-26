@@ -29,7 +29,7 @@ static float clamp(float x, float min, float max) {
 
 // based on https://easings.net/#easeOutBack
 static float easeOutBack(float percentage) {
-	float c1 = 6;
+	float c1 = 9;
 	float c3 = c1 + 1;
 	float x = percentage-1;
 
@@ -65,7 +65,7 @@ static void charging_animation_update(Animation *animation, const AnimationProgr
 			// besides easing timing between ticks, also ease tick scaling
 			float eased_tick_scale = easeOutBack(tick_percent);
 			animating_tick_sizes[i] = min(
-				ticks_size+1, ticks_size*eased_tick_scale
+				ticks_size+2, ticks_size*eased_tick_scale
 			);
 		} else {
 			animating_tick_sizes[i] = 0;
