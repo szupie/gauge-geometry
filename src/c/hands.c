@@ -339,10 +339,13 @@ static void draw_breguet_hands(Layer *layer, GContext *ctx) {
 		origin, minute_end
 	);
 
-	// minute hand eye
+	// minute hand eye (outside circle, then paint over "hole" with bg colour)
 	graphics_fill_circle(ctx, minute_eye_pos, BREGUET_MINUTE_RADIUS);
 	graphics_context_set_fill_color(ctx, get_bg_colour());
+	graphics_context_set_stroke_color(ctx, minute_stroke);
+	graphics_context_set_stroke_width(ctx, 1);
 	graphics_fill_circle(ctx, minute_hole_pos, minute_hole_radius);
+	graphics_draw_circle(ctx, minute_hole_pos, minute_hole_radius);
 
 	// === Hour hand ===
 	// Outlines
@@ -376,7 +379,10 @@ static void draw_breguet_hands(Layer *layer, GContext *ctx) {
 	// hour hand eye
 	graphics_fill_circle(ctx, hour_eye_pos, BREGUET_HOUR_RADIUS);
 	graphics_context_set_fill_color(ctx, get_bg_colour());
+	graphics_context_set_stroke_color(ctx, hour_stroke);
+	graphics_context_set_stroke_width(ctx, 1);
 	graphics_fill_circle(ctx, hour_hole_pos, hour_hole_radius);
+	graphics_draw_circle(ctx, hour_hole_pos, hour_hole_radius);
 }
 
 // Based on second hand of swiss railway station clocks
@@ -443,15 +449,15 @@ static void draw_dauphine_hands(Layer *layer, GContext *ctx) {
 	graphics_context_set_stroke_color(
 		ctx, get_stroke_colour_for_fill(minute_hand_colour)
 	);
-	gpath_draw_outline(ctx, minute_path);
 	gpath_draw_filled(ctx, minute_path);
+	gpath_draw_outline(ctx, minute_path);
 
 	graphics_context_set_fill_color(ctx, hour_hand_colour);
 	graphics_context_set_stroke_color(
 		ctx, get_stroke_colour_for_fill(hour_hand_colour)
 	);
-	gpath_draw_outline(ctx, hour_path);
 	gpath_draw_filled(ctx, hour_path);
+	gpath_draw_outline(ctx, hour_path);
 }
 
 static void set_hands_shape(enum HandShape shape) {

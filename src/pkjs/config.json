@@ -32,7 +32,7 @@
 			},
 			{
 				"type": "text",
-				"defaultValue": "<section id='presetThemes' class='rect'><button data-theme-id='bw_light'>Light</button><button data-theme-id='bw_dark'>Dark</button></section>"
+				"defaultValue": "<section id='presetThemes' class='rect'><button data-theme-id='bw_classic'>Classic</button><button data-theme-id='bw_pointer'>Pointer</button><button data-theme-id='bw_bubbles'>Bubbles</button><button data-theme-id='bw_newsprint'>Newsprint</button><button data-theme-id='bw_woodcut'>Woodcut</button></section>"
 			}
 		]
 	},
@@ -47,7 +47,8 @@
 				"type": "color",
 				"messageKey": "BG_COLOUR",
 				"defaultValue": "FFFFFF",
-				"label": "Background"
+				"label": "Background",
+				"allowGray": true
 			},
 			{
 				"type": "color",
@@ -70,8 +71,16 @@
 			},
 			{
 				"type": "color",
+				"capabilities": ["COLOR"],
 				"messageKey": "MINUTE_HAND_COLOUR",
 				"defaultValue": "0055FF",
+				"label": "Minute hand"
+			},
+			{
+				"type": "color",
+				"capabilities": ["BW"],
+				"messageKey": "MINUTE_HAND_COLOUR",
+				"defaultValue": "AAAAAA",
 				"label": "Minute hand",
 				"allowGray": true
 			},
@@ -238,7 +247,8 @@
 				"messageKey": "TEMP_NOW_COLOUR",
 				"defaultValue": "AA0000",
 				"label": "Current temperature indicator",
-				"group": "weatherDetails"
+				"group": "weatherDetails",
+				"allowGray": true
 			},
 			{
 				"type": "color",
