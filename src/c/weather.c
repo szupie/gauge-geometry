@@ -232,7 +232,7 @@ void handle_weather_update(DictionaryIterator *iterator, void *context) {
 	if(temp_now_tuple) {
 		update_temp_now((int)temp_now_tuple->value->int32);
 		persist_write_int(persist_temp_now, temp_now);
-	}
 
-	persist_write_int(persist_temp_expire, time(NULL)+EXPIRE_TIME);
+		persist_write_int(persist_temp_expire, time(NULL)+EXPIRE_TIME);
+	}
 }

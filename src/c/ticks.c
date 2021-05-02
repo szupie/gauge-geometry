@@ -2,19 +2,19 @@
 #include "graphics.h"
 
 static GColor ticks_colour;
-static int ticks_size;
+static uint8_t ticks_size;
 
 #define num_ticks 12
 static GPoint tick_positions[num_ticks];
 static Layer *ticks_layer;
 
-static int ticks_level;
+static uint8_t ticks_level;
 static bool battery_gauge_enabled = false;
 static BatteryChargeState battery_state;
 
 static Animation *charging_animation;
 static AnimationImplementation animation_implementation;
-static int animating_tick_sizes[num_ticks];
+static uint8_t animating_tick_sizes[num_ticks];
 
 
 static int min(int a, int b) {
@@ -39,7 +39,7 @@ static float easeOutBack(float percentage) {
 static void calculate_tick_positions(Layer *layer) {
 	GRect bounds = layer_get_bounds(layer);
 	GRect insetRect = grect_inset(bounds, GEdgeInsets(RING_INSET));
-	for (int i=0; i<num_ticks; i++) {
+	for (uint8_t i=0; i<num_ticks; i++) {
 		int hour_angle = DEG_TO_TRIGANGLE(i*360/num_ticks);
 
 		#if defined(PBL_ROUND)
@@ -55,15 +55,14 @@ static void calculate_tick_positions(Layer *layer) {
 static void charging_animation_update(Animation *animation, const AnimationProgress progress) {
 	float staggerness = 4.6; // higher for more delay between each tick
 	float progress_percent = (float)progress/ANIMATION_NORMALIZED_MAX;
-	for (int i=0; i<num_ticks; i++) {
+	for (uint8_t i=0; i<num_ticks; i++) {
 		if (i < ticks_level) {
 			float percent_at_tick = (float)i/(ticks_level-1);
-			float tick_percent = clamp(
+			// besides easing timing between ticks, also ease tick scaling
+			float eased_tick_scale = easeOutBack(clamp(
 				(staggerness+1)*progress_percent - staggerness*percent_at_tick,
 				0, 1
-			);
-			// besides easing timing between ticks, also ease tick scaling
-			float eased_tick_scale = easeOutBack(tick_percent);
+			));
 			animating_tick_sizes[i] = min(
 				ticks_size+2, ticks_size*eased_tick_scale
 			);
@@ -80,7 +79,7 @@ static void ticks_update_proc(Layer *layer, GContext *ctx) {
 	bool should_animate = battery_gauge_enabled && animation_is_scheduled(charging_animation);
 	// APP_LOG(APP_LOG_LEVEL_DEBUG, "redrawing ticks level %i, percentage %i", ticks_level, battery_state.charge_percent);
 
-	for (int i=0; i<num_ticks; i++) {
+	for (uint8_t i=0; i<num_ticks; i++) {
 		GPoint pos = tick_positions[i];
 		bool should_fill = (i < ticks_level);
 
@@ -93,7 +92,7 @@ static void ticks_update_proc(Layer *layer, GContext *ctx) {
 			}
 		} else {
 			if (ticks_size > 1) { // leave blank when tick size too small
-				int ring_size = ticks_size;
+				uint8_t ring_size = ticks_size;
 				if (ticks_size > 2) {
 					ring_size = ticks_size-1;
 				}
@@ -141,7 +140,7 @@ void animate_charging_indicator() {
 	animation_schedule(charging_animation);
 }
 
-void update_tick_settings(GColor colour, int size, bool battery_enabled) {
+void update_tick_settings(GColor colour, uint8_t size, bool battery_enabled) {
 	ticks_colour = colour;
 	ticks_size = size;
 	battery_gauge_enabled = battery_enabled;

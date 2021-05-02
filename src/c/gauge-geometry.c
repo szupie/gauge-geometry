@@ -202,8 +202,8 @@ static void init() {
 	window_stack_push(main_window, true);
 
 	events_app_message_register_inbox_received(handle_weather_update, NULL);
-	const int inbox_size = 128;
-	const int outbox_size = 128;
+	const int inbox_size = 32;
+	const int outbox_size = 32;
 	events_app_message_request_inbox_size(inbox_size);
 	events_app_message_request_outbox_size(outbox_size);
 	events_app_message_open();
