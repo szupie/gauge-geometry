@@ -9,22 +9,29 @@ var tempFeelsLike;
 var weatherProvider;
 var weatherAPIKey;
 
-function xhrRequest(url) {
-	return new Promise(function (resolve, reject) {
-		const xhr = new XMLHttpRequest();
-		const type = "GET";
-		xhr.onload = function() { resolve(xhr.response); };
-		xhr.onerror = reject;
-		xhr.open(type, url);
-		xhr.send();
-	});
+function createRequest(url, callback) {
+	const xhr = new XMLHttpRequest();
+	const type = "GET";
+	xhr.onload = function() {
+		try {
+			callback(xhr.response);
+		} catch (e) {
+			console.error(e);
+			// Uncomment to see request url; exposes API key in logs
+			// console.error('Request: '+url);
+			console.error('Response: '+xhr.response);
+		}
+	};
+	xhr.onerror = function() { console.error(xhr.response); };
+	xhr.open(type, url);
+	xhr.send();
 };
 
-function requestDarksky(lat, lon) {
+function requestDarksky(lat, lon, callback) {
 	const units = (tempUnits === 'c') ? 'si' : 'us';
 	const url = 'https://api.darksky.net/forecast/'+weatherAPIKey+'/'+lat+','+lon+'?units='+units+'&exclude=minutely,hourly,alerts,flags';
 
-	return xhrRequest(url).then(function (responseText) {
+	createRequest(url, function (responseText) {
 		const json = JSON.parse(responseText);
 		var now, min, max;
 		if (tempFeelsLike) {
@@ -36,15 +43,15 @@ function requestDarksky(lat, lon) {
 			min = json.daily.data[0].temperatureLow;
 			max = json.daily.data[0].temperatureHigh;
 		}
-		return [now, min, max];
+		callback([now, min, max]);
 	});
 }
 
-function requestOwm(lat, lon) {
+function requestOwm(lat, lon, callback) {
 	const units = (tempUnits === 'c') ? 'metric' : 'imperial';
 	const url = 'https://api.openweathermap.org/data/2.5/onecall?lat='+lat+'&lon='+lon+'&units='+units+'&appid='+weatherAPIKey+'&exclude=hourly,minutely';
 
-	return xhrRequest(url).then(function (responseText) {
+	createRequest(url, function (responseText) {
 		const json = JSON.parse(responseText);
 		var now, min, max;
 		if (tempFeelsLike) {
@@ -54,69 +61,64 @@ function requestOwm(lat, lon) {
 		}
 		min = json.daily[0].temp.min;
 		max = json.daily[0].temp.max;
-		return [now, min, max];
+		callback([now, min, max]);
 	});
 }
 
-function requestTomorrow(lat, lon) {
+function requestTomorrow(lat, lon, callback) {
 	const units = (tempUnits === 'c') ? 'metric' : 'imperial';
 	const tempField = tempFeelsLike ? 'temperatureApparent' : 'temperature';
 	const query = 'location='+lat+'%2C'+lon+'&units='+units+'&apikey='+weatherAPIKey;
 
 	const nowEndpoint = 'https://api.tomorrow.io/v4/timelines?fields='+tempField+'&timesteps=current&'+query;
-	const nowRequest = xhrRequest(nowEndpoint).then(function (responseText) {
-		const json = JSON.parse(responseText);
-		return json.data.timelines[0].intervals[0].values[tempField];
-	});
-
 	const dailyEndpoint = 'https://api.tomorrow.io/v4/timelines?fields='+tempField+'Min&fields='+tempField+'Max&timesteps=1d&'+query;
-	const dailyRequest = xhrRequest(dailyEndpoint).then(function (responseText) {
-		const json = JSON.parse(responseText);
-		const minMax = json.data.timelines[0].intervals[0].values;
-		const min = minMax[tempField+'Min'];
-		const max = minMax[tempField+'Max'];
-		return [min, max];
-	});
 
-	return Promise.all([nowRequest, dailyRequest]).then(function (results) {
-		const now = results[0]
-		const minMax = results[1];
-		return [now, minMax[0], minMax[1]];
+	createRequest(nowEndpoint, function (responseText) {
+		const json = JSON.parse(responseText);
+		const now = json.data.timelines[0].intervals[0].values[tempField];
+
+		setTimeout(function() {
+			createRequest(dailyEndpoint, function (responseText) {
+				const json = JSON.parse(responseText);
+				const minMax = json.data.timelines[0].intervals[0].values;
+				const min = minMax[tempField+'Min'];
+				const max = minMax[tempField+'Max'];
+				callback([now, min, max]);
+			});
+		}, 5000);
 	});
 }
 
-function requestWeatherbit(lat, lon) {
+function requestWeatherbit(lat, lon, callback) {
 	const units = (tempUnits === 'c') ? 'M' : 'I';
 	const query = 'lat='+lat+'&lon='+lon+'&units='+units+'&key='+weatherAPIKey;
 
 	const nowEndpoint = 'https://api.weatherbit.io/v2.0/current?'+query;
-	const nowRequest = xhrRequest(nowEndpoint).then(function (responseText) {
-		const json = JSON.parse(responseText);
-		if (tempFeelsLike) {
-			return json.data[0].app_temp;
-		} else {
-			return json.data[0].temp;
-		}
-	});
-
 	const dailyEndpoint = 'https://api.weatherbit.io/v2.0/forecast/daily?days=1&'+query;
-	const dailyRequest = xhrRequest(dailyEndpoint).then(function (responseText) {
-		const json = JSON.parse(responseText);
-		var min, max;
-		if (tempFeelsLike) {
-			min = json.data[0].app_min_temp;
-			max = json.data[0].app_max_temp;
-		} else {
-			min = json.data[0].min_temp;
-			max = json.data[0].max_temp;
-		}
-		return [min, max];
-	});
 
-	return Promise.all([nowRequest, dailyRequest]).then(function (results) {
-		const now = results[0]
-		const minMax = results[1];
-		return [now, minMax[0], minMax[1]];
+	createRequest(nowEndpoint, function (responseText) {
+		const json = JSON.parse(responseText);
+		var now;
+		if (tempFeelsLike) {
+			now = json.data[0].app_temp;
+		} else {
+			now = json.data[0].temp;
+		}
+
+		setTimeout(function() {
+			createRequest(dailyEndpoint, function (responseText) {
+				const json = JSON.parse(responseText);
+				var min, max;
+				if (tempFeelsLike) {
+					min = json.data[0].app_min_temp;
+					max = json.data[0].app_max_temp;
+				} else {
+					min = json.data[0].min_temp;
+					max = json.data[0].max_temp;
+				}
+				callback([now, min, max]);
+			});
+		}, 5000);
 	});
 }
 
@@ -125,26 +127,29 @@ function locationSuccess(pos) {
 	if (weatherAPIKey) {
 		const lat = pos.coords.latitude;
 		const lon = pos.coords.longitude;
-		var weatherPromise;
+		var weatherFunction;
 		switch (weatherProvider) {
 			case 'darksky':
-				weatherPromise = requestDarksky(lat, lon);
+				weatherFunction = requestDarksky;
 				break;
 			case 'owm':
-				weatherPromise = requestOwm(lat, lon);
+				weatherFunction = requestOwm;
 				break;
 			case 'tomorrow':
-				weatherPromise = requestTomorrow(lat, lon);
+				weatherFunction = requestTomorrow;
 				break;
 			case 'weatherbit':
-				weatherPromise = requestWeatherbit(lat, lon);
+				weatherFunction = requestWeatherbit;
 				break;
 		}
 
-		weatherPromise.then(function (nowMinMaxTuple) {
-
-			var now, min, max;
-			[now, min, max] = nowMinMaxTuple.map(function (val) { return Math.round(val) });
+		function callback(nowMinMaxTuple) {
+			const roundedTuple = nowMinMaxTuple.map(function (val) {
+				return Math.round(val);
+			});
+			const now = roundedTuple[0];
+			const min = roundedTuple[1];
+			const max = roundedTuple[2];
 
 			console.log('Current temp: '+now+'; min: '+min+'; max: '+max);
 
@@ -164,7 +169,9 @@ function locationSuccess(pos) {
 					console.log('Error sending weather info to Pebble!');
 				}
 			);
-		});
+		}
+
+		weatherFunction(lat, lon, callback);
 	}
 }
 
