@@ -1,5 +1,6 @@
 node_modules
 build
+src/pkjs/clay.js
 .lock-waf_linux2_build
 pebble_screenshot_*
 *:Zone.Identifier
