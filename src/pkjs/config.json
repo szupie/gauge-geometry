@@ -179,12 +179,12 @@
 						"value": "darksky"
 					},
 					{ 
-						"label": "ClimaCell",
-						"value": "climacell"
-					},
-					{ 
 						"label": "OpenWeather",
 						"value": "owm"
+					},
+					{ 
+						"label": "Tomorrow.io",
+						"value": "tomorrow"
 					},
 					{ 
 						"label": "Weatherbit",

@@ -40,32 +40,6 @@ function requestDarksky(lat, lon) {
 	});
 }
 
-function requestClimacell(lat, lon) {
-	const units = (tempUnits === 'c') ? 'si' : 'us';
-	const tempField = tempFeelsLike ? 'feels_like' : 'temp';
-	const query = 'lat='+lat+'&lon='+lon+'&unit_system='+units+'&fields='+tempField+'&apikey='+weatherAPIKey;
-
-	const nowEndpoint = 'https://api.climacell.co/v3/weather/realtime?'+query;
-	const nowRequest = xhrRequest(nowEndpoint).then(function (responseText) {
-		const json = JSON.parse(responseText);
-		return json[tempField].value;
-	});
-
-	const dailyEndpoint = 'https://api.climacell.co/v3/weather/forecast/daily?start_time=now&'+query;
-	const dailyRequest = xhrRequest(dailyEndpoint).then(function (responseText) {
-		const json = JSON.parse(responseText);
-		const min = json[0][tempField][0].min.value;
-		const max = json[0][tempField][1].max.value;
-		return [min, max];
-	});
-
-	return Promise.all([nowRequest, dailyRequest]).then(function (results) {
-		const now = results[0]
-		const minMax = results[1];
-		return [now, minMax[0], minMax[1]];
-	});
-}
-
 function requestOwm(lat, lon) {
 	const units = (tempUnits === 'c') ? 'metric' : 'imperial';
 	const url = 'https://api.openweathermap.org/data/2.5/onecall?lat='+lat+'&lon='+lon+'&units='+units+'&appid='+weatherAPIKey+'&exclude=hourly,minutely';
@@ -81,6 +55,33 @@ function requestOwm(lat, lon) {
 		min = json.daily[0].temp.min;
 		max = json.daily[0].temp.max;
 		return [now, min, max];
+	});
+}
+
+function requestTomorrow(lat, lon) {
+	const units = (tempUnits === 'c') ? 'metric' : 'imperial';
+	const tempField = tempFeelsLike ? 'temperatureApparent' : 'temperature';
+	const query = 'location='+lat+'%2C'+lon+'&units='+units+'&apikey='+weatherAPIKey;
+
+	const nowEndpoint = 'https://api.tomorrow.io/v4/timelines?fields='+tempField+'&timesteps=current&'+query;
+	const nowRequest = xhrRequest(nowEndpoint).then(function (responseText) {
+		const json = JSON.parse(responseText);
+		return json.data.timelines[0].intervals[0].values[tempField];
+	});
+
+	const dailyEndpoint = 'https://api.tomorrow.io/v4/timelines?fields='+tempField+'Min&fields='+tempField+'Max&timesteps=1d&'+query;
+	const dailyRequest = xhrRequest(dailyEndpoint).then(function (responseText) {
+		const json = JSON.parse(responseText);
+		const minMax = json.data.timelines[0].intervals[0].values;
+		const min = minMax[tempField+'Min'];
+		const max = minMax[tempField+'Max'];
+		return [min, max];
+	});
+
+	return Promise.all([nowRequest, dailyRequest]).then(function (results) {
+		const now = results[0]
+		const minMax = results[1];
+		return [now, minMax[0], minMax[1]];
 	});
 }
 
@@ -129,11 +130,11 @@ function locationSuccess(pos) {
 			case 'darksky':
 				weatherPromise = requestDarksky(lat, lon);
 				break;
-			case 'climacell':
-				weatherPromise = requestClimacell(lat, lon);
-				break;
 			case 'owm':
 				weatherPromise = requestOwm(lat, lon);
+				break;
+			case 'tomorrow':
+				weatherPromise = requestTomorrow(lat, lon);
 				break;
 			case 'weatherbit':
 				weatherPromise = requestWeatherbit(lat, lon);
