@@ -1,15 +1,14 @@
 #include "weather.h"
+#include "settings.h"
 #include "graphics.h"
-
-#include "enamel.h"
 
 #define EXPIRE_TIME 60*60*24*2 // 2 days
 
 // these are keys for persistent storage
-uint32_t persist_temp_now = 1;
-uint32_t persist_temp_min = 2;
-uint32_t persist_temp_max = 3;
-uint32_t persist_temp_expire = 4;
+uint32_t PERSIST_KEY_TEMP_NOW = 1;
+uint32_t PERSIST_KEY_TEMP_MIN = 2;
+uint32_t PERSIST_KEY_TEMP_MAX = 3;
+uint32_t PERSIST_KEY_TEMP_EXPIRE = 4;
 
 static int temp_min, temp_max, temp_now;
 static bool temp_range_defined = false;
@@ -128,10 +127,10 @@ static void temp_range_update_proc(Layer *layer, GContext *ctx) {
 }
 
 static void clear_weather_cache() {
-	persist_delete(persist_temp_now);
-	persist_delete(persist_temp_min);
-	persist_delete(persist_temp_max);
-	persist_delete(persist_temp_expire);
+	persist_delete(PERSIST_KEY_TEMP_NOW);
+	persist_delete(PERSIST_KEY_TEMP_MIN);
+	persist_delete(PERSIST_KEY_TEMP_MAX);
+	persist_delete(PERSIST_KEY_TEMP_EXPIRE);
 	temp_range_defined = false;
 	temp_now_defined = false;
 }
@@ -142,20 +141,20 @@ void init_weather(Layer *range_layer, Layer *now_layer) {
 	layer_set_update_proc(temp_range_layer, temp_range_update_proc);
 	layer_set_update_proc(temp_now_layer, temp_now_update_proc);
 
-	temp_unit = enamel_get_TEMP_UNIT()[0];
+	temp_unit = settings.TempUnit;
 
-	if (persist_exists(persist_temp_expire)) {
-		if (persist_read_int(persist_temp_expire) > time(NULL)) {
+	if (persist_exists(PERSIST_KEY_TEMP_EXPIRE)) {
+		if (persist_read_int(PERSIST_KEY_TEMP_EXPIRE) > time(NULL)) {
 
-			if (persist_exists(persist_temp_min) && persist_exists(persist_temp_max)) {
+			if (persist_exists(PERSIST_KEY_TEMP_MIN) && persist_exists(PERSIST_KEY_TEMP_MAX)) {
 				update_temp_range(
-					persist_read_int(persist_temp_min),
-					persist_read_int(persist_temp_max)
+					persist_read_int(PERSIST_KEY_TEMP_MIN),
+					persist_read_int(PERSIST_KEY_TEMP_MAX)
 				);
 			}
-			if (persist_exists(persist_temp_now)) {
+			if (persist_exists(PERSIST_KEY_TEMP_NOW)) {
 				update_temp_now(
-					persist_read_int(persist_temp_now)
+					persist_read_int(PERSIST_KEY_TEMP_NOW)
 				);
 			}
 		} else {
@@ -181,16 +180,15 @@ void set_temp_now_colour(GColor colour) {
 	temp_now_colour_defined = true;
 }
 
-void check_temp_unit_change() {
-	char latest_unit = enamel_get_TEMP_UNIT()[0];
+void check_temp_unit_change(char new_temp_unit) {
 	// Clear cached temps when switching units as old values become nonsense
-	if (latest_unit != temp_unit) {
+	if (new_temp_unit != temp_unit) {
 		clear_weather_cache();
 
 		layer_mark_dirty(temp_range_layer);
 		layer_mark_dirty(temp_now_layer);
 	}
-	temp_unit = latest_unit;
+	temp_unit = new_temp_unit;
 }
 
 void update_temp_range(int min, int max) {
@@ -220,19 +218,19 @@ void handle_weather_update(DictionaryIterator *iterator, void *context) {
 	Tuple *temp_max_tuple = dict_find(iterator, MESSAGE_KEY_TEMP_MAX);
 
 	// If temp range is available
-	if(temp_min_tuple && temp_max_tuple) {
+	if (temp_min_tuple && temp_max_tuple) {
 		update_temp_range(
 			(int)temp_min_tuple->value->int32,
 			(int)temp_max_tuple->value->int32
 		);
-		persist_write_int(persist_temp_min, temp_min);
-		persist_write_int(persist_temp_max, temp_max);
+		persist_write_int(PERSIST_KEY_TEMP_MIN, temp_min);
+		persist_write_int(PERSIST_KEY_TEMP_MAX, temp_max);
 	}
 
-	if(temp_now_tuple) {
+	if (temp_now_tuple) {
 		update_temp_now((int)temp_now_tuple->value->int32);
-		persist_write_int(persist_temp_now, temp_now);
+		persist_write_int(PERSIST_KEY_TEMP_NOW, temp_now);
 
-		persist_write_int(persist_temp_expire, time(NULL)+EXPIRE_TIME);
+		persist_write_int(PERSIST_KEY_TEMP_EXPIRE, time(NULL)+EXPIRE_TIME);
 	}
 }

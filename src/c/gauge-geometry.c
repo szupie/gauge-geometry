@@ -1,14 +1,12 @@
 #include <pebble.h>
 #include "graphics.h"
+#include "settings.h"
 #include "ticks.h"
 #include "weather.h"
 
-#include "enamel.h"
 #include <pebble-events/pebble-events.h>
 
 static Window *main_window;
-
-static EventHandle settings_updated_handle;
 
 static bool last_charging_state;
 
@@ -113,10 +111,6 @@ static void refresh_date_time() {
 	display_date(tick_time);
 }
 
-static void handle_settings_received(void *context) {
-	update_style();
-}
-
 #ifdef DEBUGGING_TIME
 static time_t debug_now;
 static struct tm *debug_time;
@@ -175,8 +169,6 @@ static void main_window_load(Window *window) {
 	update_temp_now(18);
 	#endif
 
-	settings_updated_handle = enamel_settings_received_subscribe(handle_settings_received, NULL);
-
 	// DEBUGGING
 	#ifdef DEBUGGING_TIME
 	debug_now = time(NULL);
@@ -186,13 +178,11 @@ static void main_window_load(Window *window) {
 }
 
 static void main_window_unload(Window *window) {
-	enamel_settings_received_unsubscribe(settings_updated_handle);
 	destroy_layers();
 }
 
 static void init() {
-	// Initialize Enamel to register App Message handlers and restores settings
-	enamel_init();
+	load_settings();
 
 	main_window = window_create();
 	window_set_window_handlers(main_window, (WindowHandlers) {
@@ -202,8 +192,9 @@ static void init() {
 	window_stack_push(main_window, true);
 
 	events_app_message_register_inbox_received(handle_weather_update, NULL);
-	const int inbox_size = 32;
-	const int outbox_size = 32;
+	events_app_message_register_inbox_received(handle_settings_received, NULL);
+	const int inbox_size = 256;
+	const int outbox_size = 256;
 	events_app_message_request_inbox_size(inbox_size);
 	events_app_message_request_outbox_size(outbox_size);
 	events_app_message_open();
@@ -214,9 +205,6 @@ static void deinit() {
 	tick_timer_service_unsubscribe();
 	battery_state_service_unsubscribe();
 	window_destroy(main_window);
-
-	// Deinit Enamel to unregister App Message handlers and save settings
-	enamel_deinit();
 }
 
 int main(void) {

@@ -1,10 +1,9 @@
 #include "graphics.h"
+#include "settings.h"
 #include "big-digits.h"
 #include "hands.h"
 #include "ticks.h"
 #include "weather.h"
-
-#include "enamel.h"
 
 static Layer* window_layer;
 
@@ -90,18 +89,18 @@ static void init_text_layers(GRect bounds) {
 	layer_add_child(date_group_layer, text_layer_get_layer(date_text_layer));
 }
 
-static enum HandShape enamel_to_hand_shape(HANDS_SHAPEValue enamel_value) {
-	switch (enamel_value) {
-		case HANDS_SHAPE_BAGUETTE:
-			return BAGUETTE;
-		case HANDS_SHAPE_PENCIL:
+static enum HandShape id_to_hand_shape(char id) {
+	switch (id) {
+		case '1':
 			return PENCIL;
-		case HANDS_SHAPE_BREGUET:
+		case '2':
+			return BAGUETTE;
+		case '3':
 			return BREGUET;
-		case HANDS_SHAPE_SWISS_RAIL:
+		case '4':
 			return SWISSRAIL;
 		default:
-		case HANDS_SHAPE_DAUPHINE:
+		case '0':
 			return DAUPHINE;
 	}
 }
@@ -143,24 +142,22 @@ void load_window(Window *window) {
 }
 
 void update_style() {
-	bg_colour = enamel_get_BG_COLOUR();
-	set_digits_colour(enamel_get_TIME_COLOUR());
-	date_colour = enamel_get_DATE_COLOUR();
+	bg_colour = settings.BgColour;
+	set_digits_colour(settings.TimeColour);
+	date_colour = settings.DateColour;
 	update_hands_settings(
-		enamel_get_HOUR_HAND_COLOUR(),
-		enamel_get_MINUTE_HAND_COLOUR(),
-		enamel_to_hand_shape(enamel_get_hands_shape())
+		settings.HourHandColour,
+		settings.MinuteHandColour,
+		id_to_hand_shape(settings.HandsShape)
 	);
 
 	update_tick_settings(
-		enamel_get_TICKS_COLOUR(),
-		enamel_get_TICKS_SIZE(),
-		enamel_get_BATTERY_GAUGE_ENABLED()
+		settings.TicksColour,
+		settings.TicksSize,
+		settings.BatteryGaugeEnabled
 	);
-	enable_temp(enamel_get_TEMP_ENABLED());
-	check_temp_unit_change();
-	set_temp_range_colour(enamel_get_TEMP_RANGE_COLOUR());
-	set_temp_now_colour(enamel_get_TEMP_NOW_COLOUR());
+	set_temp_range_colour(settings.TempRangeColour);
+	set_temp_now_colour(settings.TempNowColour);
 	
 	window_set_background_color(layer_get_window(window_layer), bg_colour);
 
