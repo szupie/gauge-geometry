@@ -13,6 +13,6 @@ To build this project, you’ll need the Pebble SDK installed ([setup guide](htt
 `pebble install --emulator [basalt, chalk]` or `pebble install --phone phone_ip` to run on the emulator or a Pebble.
 
 ## Credits
-This project uses [Clay](https://github.com/pebble/clay), [Enamel](https://github.com/gregoiresage/enamel), [GBitmap Colour Palette Manipulator](https://github.com/rebootsramblings/GBitmap-Colour-Palette-Manipulator), and [pebble-events](https://github.com/Katharine/pebble-events).
+This project uses [Clay](https://github.com/pebble/clay), [GBitmap Colour Palette Manipulator](https://github.com/rebootsramblings/GBitmap-Colour-Palette-Manipulator), and [pebble-events](https://github.com/Katharine/pebble-events).
 
 Digital time is set in Century Gothic. Day/date text is set in [Poppins](https://github.com/itfoundry/poppins).
