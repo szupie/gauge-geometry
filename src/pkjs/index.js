@@ -52,19 +52,46 @@ function createRequest(url, callback, attempt) {
 
 function requestOwm(lat, lon, callback) {
 	const units = (tempUnits === 'c') ? 'metric' : 'imperial';
-	const url = 'http://api.openweathermap.org/data/2.5/onecall?lat='+lat+'&lon='+lon+'&units='+units+'&appid='+weatherAPIKey+'&exclude=hourly,minutely,alerts';
+	const query = 'lat='+lat+'&lon='+lon+'&units='+units+'&appid='+weatherAPIKey;
+	const nowEndpoint = 'https://api.openweathermap.org/data/2.5/weather?'+query;
 
-	createRequest(url, function (responseText) {
+	// This endpoint provides the forecast for a 3-hour window. Grab the next 24 hours.
+	const dailyEndpoint = 'https://api.openweathermap.org/data/2.5/forecast?cnt=8&'+query;
+	console.log(nowEndpoint);
+	console.log(dailyEndpoint);
+
+	createRequest(nowEndpoint, function (responseText) {
 		const json = JSON.parse(responseText);
 		var now, min, max;
 		if (tempFeelsLike) {
-			now = json.current.feels_like;
+			now = json.main.feels_like;
 		} else {
-			now = json.current.temp;
+			now = json.main.temp;
 		}
-		min = json.daily[0].temp.min;
-		max = json.daily[0].temp.max;
-		callback([now, min, max]);
+
+		createRequest(dailyEndpoint, function (responseText) {
+			const json = JSON.parse(responseText);
+			min = json.list[0].main.temp_min;
+			max = json.list[0].main.temp_max;
+
+			for (i = 1; i < json.list.length; i++) {
+				if (json.list[i].main.temp_min < min) {
+					min = json.list[i].main.temp_min;
+				}
+				if (json.list[i].main.temp_max > max) {
+					max = json.list[i].main.temp_max;
+				}
+			}
+
+			if (now < min) {
+				min = now;
+			}
+			if (now > max) {
+				max = now;
+			}
+
+			callback([now, min, max]);
+		});
 	});
 }
 
