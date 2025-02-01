@@ -50,26 +50,6 @@ function createRequest(url, callback, attempt) {
 	xhr.send();
 };
 
-function requestDarksky(lat, lon, callback) {
-	const units = (tempUnits === 'c') ? 'si' : 'us';
-	const url = 'https://api.darksky.net/forecast/'+weatherAPIKey+'/'+lat+','+lon+'?units='+units+'&exclude=minutely,hourly,alerts,flags';
-
-	createRequest(url, function (responseText) {
-		const json = JSON.parse(responseText);
-		var now, min, max;
-		if (tempFeelsLike) {
-			now = json.currently.apparentTemperature;
-			min = json.daily.data[0].apparentTemperatureLow;
-			max = json.daily.data[0].apparentTemperatureHigh;
-		} else {
-			now = json.currently.temperature;
-			min = json.daily.data[0].temperatureLow;
-			max = json.daily.data[0].temperatureHigh;
-		}
-		callback([now, min, max]);
-	});
-}
-
 function requestOwm(lat, lon, callback) {
 	const units = (tempUnits === 'c') ? 'metric' : 'imperial';
 	const url = 'http://api.openweathermap.org/data/2.5/onecall?lat='+lat+'&lon='+lon+'&units='+units+'&appid='+weatherAPIKey+'&exclude=hourly,minutely,alerts';
@@ -148,9 +128,6 @@ function locationSuccess(pos) {
 		const lon = pos.coords.longitude;
 		var weatherFunction;
 		switch (weatherProvider) {
-			case 'darksky':
-				weatherFunction = requestDarksky;
-				break;
 			case 'owm':
 				weatherFunction = requestOwm;
 				break;
