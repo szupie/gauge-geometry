@@ -71,25 +71,8 @@ function requestOwm(lat, lon, callback) {
 
 		createRequest(dailyEndpoint, function (responseText) {
 			const json = JSON.parse(responseText);
-			min = json.list[0].main.temp_min;
-			max = json.list[0].main.temp_max;
-
-			for (i = 1; i < json.list.length; i++) {
-				if (json.list[i].main.temp_min < min) {
-					min = json.list[i].main.temp_min;
-				}
-				if (json.list[i].main.temp_max > max) {
-					max = json.list[i].main.temp_max;
-				}
-			}
-
-			if (now < min) {
-				min = now;
-			}
-			if (now > max) {
-				max = now;
-			}
-
+			min = Math.min.apply(null, [now].concat(json.list.map(function (t) { return t.main.temp_min; })));
+			max = Math.max.apply(null, [now].concat(json.list.map(function (t) { return t.main.temp_max; })));
 			callback([now, min, max]);
 		});
 	});
