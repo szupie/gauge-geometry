@@ -57,8 +57,6 @@ function requestOwm(lat, lon, callback) {
 
 	// This endpoint provides the forecast for a 3-hour window. Grab the next 24 hours.
 	const dailyEndpoint = 'https://api.openweathermap.org/data/2.5/forecast?cnt=8&'+query;
-	console.log(nowEndpoint);
-	console.log(dailyEndpoint);
 
 	createRequest(nowEndpoint, function (responseText) {
 		const json = JSON.parse(responseText);
