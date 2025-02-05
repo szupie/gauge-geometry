@@ -50,41 +50,29 @@ function createRequest(url, callback, attempt) {
 	xhr.send();
 };
 
-function requestDarksky(lat, lon, callback) {
-	const units = (tempUnits === 'c') ? 'si' : 'us';
-	const url = 'https://api.darksky.net/forecast/'+weatherAPIKey+'/'+lat+','+lon+'?units='+units+'&exclude=minutely,hourly,alerts,flags';
-
-	createRequest(url, function (responseText) {
-		const json = JSON.parse(responseText);
-		var now, min, max;
-		if (tempFeelsLike) {
-			now = json.currently.apparentTemperature;
-			min = json.daily.data[0].apparentTemperatureLow;
-			max = json.daily.data[0].apparentTemperatureHigh;
-		} else {
-			now = json.currently.temperature;
-			min = json.daily.data[0].temperatureLow;
-			max = json.daily.data[0].temperatureHigh;
-		}
-		callback([now, min, max]);
-	});
-}
-
 function requestOwm(lat, lon, callback) {
 	const units = (tempUnits === 'c') ? 'metric' : 'imperial';
-	const url = 'http://api.openweathermap.org/data/2.5/onecall?lat='+lat+'&lon='+lon+'&units='+units+'&appid='+weatherAPIKey+'&exclude=hourly,minutely,alerts';
+	const query = 'lat='+lat+'&lon='+lon+'&units='+units+'&appid='+weatherAPIKey;
+	const nowEndpoint = 'https://api.openweathermap.org/data/2.5/weather?'+query;
 
-	createRequest(url, function (responseText) {
+	// This endpoint provides the forecast for a 3-hour window. Grab the next 24 hours.
+	const dailyEndpoint = 'https://api.openweathermap.org/data/2.5/forecast?cnt=8&'+query;
+
+	createRequest(nowEndpoint, function (responseText) {
 		const json = JSON.parse(responseText);
 		var now, min, max;
 		if (tempFeelsLike) {
-			now = json.current.feels_like;
+			now = json.main.feels_like;
 		} else {
-			now = json.current.temp;
+			now = json.main.temp;
 		}
-		min = json.daily[0].temp.min;
-		max = json.daily[0].temp.max;
-		callback([now, min, max]);
+
+		createRequest(dailyEndpoint, function (responseText) {
+			const json = JSON.parse(responseText);
+			min = Math.min.apply(null, [now].concat(json.list.map(function (t) { return t.main.temp_min; })));
+			max = Math.max.apply(null, [now].concat(json.list.map(function (t) { return t.main.temp_max; })));
+			callback([now, min, max]);
+		});
 	});
 }
 
@@ -148,9 +136,6 @@ function locationSuccess(pos) {
 		const lon = pos.coords.longitude;
 		var weatherFunction;
 		switch (weatherProvider) {
-			case 'darksky':
-				weatherFunction = requestDarksky;
-				break;
 			case 'owm':
 				weatherFunction = requestOwm;
 				break;

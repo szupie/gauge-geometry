@@ -175,10 +175,6 @@
 						"value": "none"
 					},
 					{ 
-						"label": "Dark Sky",
-						"value": "darksky"
-					},
-					{ 
 						"label": "OpenWeather",
 						"value": "owm"
 					},
