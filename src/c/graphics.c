@@ -30,7 +30,11 @@ static void update_date_group_position(unsigned short hour) {
 	#if defined(PBL_ROUND)
 	GRect bounds = layer_get_bounds(window_layer);
 	int center = bounds.size.w / 2;
+	#if PBL_DISPLAY_WIDTH > 180
+	int left = 15;
+	#else
 	int left = center/2 - frame.size.w/2;
+	#endif
 
 	if (hour >= 20) {
 		frame.origin.x = left - 10;
@@ -55,16 +59,17 @@ static void update_date_group_position(unsigned short hour) {
 static void init_text_layers(GRect bounds) {
 	// create day of week and date text layers
 	int line_height = 16;
-	int bottom = bounds.size.h / 2 - 3;
+	#if PBL_DISPLAY_HEIGHT > 180
+	int datetime_v_offset = -5;
+	#else
+	int datetime_v_offset = -3;
+	#endif
+	int bottom = bounds.size.h / 2 + datetime_v_offset;
 	int width = 80;
 	#if defined(PBL_ROUND)
 	int top = bottom - (line_height*2);
 	#elif defined(PBL_RECT)
 	int top = bottom - (line_height*3);
-	#endif
-
-	#if PBL_DISPLAY_HEIGHT > 180
-	top -= EMERY_LEADING / 2;
 	#endif
 
 	date_group_layer = layer_create(GRect(0, top, width, line_height*3.5));

@@ -258,6 +258,96 @@
 						"aplite",
 						"diorite"
 					]
+				},
+				{
+					"type": "bitmap",
+					"name": "CENTURY_GOTHIC_0",
+					"file": "century-gothic/0-128.png",
+					"targetPlatforms": [
+						"emery",
+						"gabbro"
+					]
+				},
+				{
+					"type": "bitmap",
+					"name": "CENTURY_GOTHIC_1",
+					"file": "century-gothic/1-128.png",
+					"targetPlatforms": [
+						"emery",
+						"gabbro"
+					]
+				},
+				{
+					"type": "bitmap",
+					"name": "CENTURY_GOTHIC_2",
+					"file": "century-gothic/2-128.png",
+					"targetPlatforms": [
+						"emery",
+						"gabbro"
+					]
+				},
+				{
+					"type": "bitmap",
+					"name": "CENTURY_GOTHIC_3",
+					"file": "century-gothic/3-128.png",
+					"targetPlatforms": [
+						"emery",
+						"gabbro"
+					]
+				},
+				{
+					"type": "bitmap",
+					"name": "CENTURY_GOTHIC_4",
+					"file": "century-gothic/4-128.png",
+					"targetPlatforms": [
+						"emery",
+						"gabbro"
+					]
+				},
+				{
+					"type": "bitmap",
+					"name": "CENTURY_GOTHIC_5",
+					"file": "century-gothic/5-128.png",
+					"targetPlatforms": [
+						"emery",
+						"gabbro"
+					]
+				},
+				{
+					"type": "bitmap",
+					"name": "CENTURY_GOTHIC_6",
+					"file": "century-gothic/6-128.png",
+					"targetPlatforms": [
+						"emery",
+						"gabbro"
+					]
+				},
+				{
+					"type": "bitmap",
+					"name": "CENTURY_GOTHIC_7",
+					"file": "century-gothic/7-128.png",
+					"targetPlatforms": [
+						"emery",
+						"gabbro"
+					]
+				},
+				{
+					"type": "bitmap",
+					"name": "CENTURY_GOTHIC_8",
+					"file": "century-gothic/8-128.png",
+					"targetPlatforms": [
+						"emery",
+						"gabbro"
+					]
+				},
+				{
+					"type": "bitmap",
+					"name": "CENTURY_GOTHIC_9",
+					"file": "century-gothic/9-128.png",
+					"targetPlatforms": [
+						"emery",
+						"gabbro"
+					]
 				}
 			]
 		}

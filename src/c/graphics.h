@@ -12,9 +12,6 @@
 #define TEMP_NOW_STROKE 7
 #define TEXT_SHADOW_OFFSET 1
 
-#define EMERY_LEADING 14
-
-
 void load_window(Window *window);
 void update_style();
 void update_time(unsigned short hour, unsigned short minute);
