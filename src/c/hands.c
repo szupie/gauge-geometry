@@ -1,5 +1,6 @@
 #include "hands.h"
 #include "graphics.h"
+#include <math.h>
 
 static Layer *hands_layer;
 
@@ -162,7 +163,7 @@ static void draw_pencil_hand(
 
 	for (int i=0; i<thickness*density; i++) {
 		float transverse_offset = (i+1)/(float)density - thickness/2.0;
-		float offcenterness = abs(i+1 - thickness*density/2.0)/(float)density;
+		float offcenterness = fabs(i+1 - thickness*density/2.0)/(float)density;
 		float pointy_offset = PENCIL_SHARPNESS*offcenterness - outset_distance;
 
 		GPoint offset = GPoint(

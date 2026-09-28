@@ -1,14 +1,14 @@
 {
 	"name": "gauge-geometry",
 	"author": "szupie",
-	"version": "1.5.0",
+	"version": "2.0.0",
 	"keywords": [
 		"pebble-app"
 	],
 	"private": true,
 	"dependencies": {
-		"pebble-clay": "^1.0.4",
-		"pebble-events": "^1.2.0"
+		"@rebble/clay": "^1.1.0",
+		"pebble-events": "^1.2.1"
 	},
 	"pebble": {
 		"displayName": "Gauge Geometry",
@@ -20,7 +20,8 @@
 			"basalt",
 			"aplite",
 			"diorite",
-			"emery"
+			"emery",
+			"gabbro"
 		],
 		"watchapp": {
 			"watchface": true

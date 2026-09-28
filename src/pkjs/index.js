@@ -1,4 +1,4 @@
-const Clay = require('pebble-clay');
+const Clay = require('@rebble/clay');
 const clayConfig = require('./config.json');
 const customClay = require('./custom-clay');
 const clay = new Clay(clayConfig, customClay);
