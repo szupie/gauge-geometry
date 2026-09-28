@@ -129,7 +129,7 @@ static void handle_test(struct tm *tick_time, TimeUnits units_changed) {
 	int temp_min = rand() % 30 - 20;
 	int temp_max = rand() % 50 + temp_min;
 	update_temp_range(temp_min, temp_max);
-	update_temp_now(tick_time->tm_sec-20);
+	update_temp_now(40-tick_time->tm_sec);
 
 	debug_now = time(NULL);
 	debug_time = localtime(&debug_now);
