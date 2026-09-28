@@ -301,16 +301,16 @@ static void draw_breguet_hands(Layer *layer, GContext *ctx) {
 	GColor hour_stroke = get_stroke_colour_for_fill(hour_hand_colour);
 
 	GPoint hour_eye_pos = {
-		origin.x+v_component(hour_angle)*BREGUET_HOUR_EYE_DIST, 
-		origin.y-h_component(hour_angle)*BREGUET_HOUR_EYE_DIST
+		origin.x+v_component(hour_angle)*(BREGUET_HOUR_LENGTH-BREGUET_EYE_DIST), 
+		origin.y-h_component(hour_angle)*(BREGUET_HOUR_LENGTH-BREGUET_EYE_DIST)
 	};
 	GPoint hour_hole_pos = {
 		hour_eye_pos.x+v_component(hour_angle)*(BREGUET_EYE_THICKNESS-1), 
 		hour_eye_pos.y-h_component(hour_angle)*(BREGUET_EYE_THICKNESS-1)
 	};
 	GPoint minute_eye_pos = {
-		origin.x+v_component(minute_angle)*BREGUET_MINUTE_EYE_DIST, 
-		origin.y-h_component(minute_angle)*BREGUET_MINUTE_EYE_DIST
+		origin.x+v_component(minute_angle)*(BREGUET_MINUTE_LENGTH-BREGUET_EYE_DIST), 
+		origin.y-h_component(minute_angle)*(BREGUET_MINUTE_LENGTH-BREGUET_EYE_DIST)
 	};
 	GPoint minute_hole_pos = {
 		minute_eye_pos.x+v_component(minute_angle)*(BREGUET_EYE_THICKNESS-1), 
