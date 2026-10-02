@@ -168,12 +168,6 @@ module.exports = function(minified) {
 
 		function updateWeatherElements() {
 
-			if (weatherProviderInput.get() === 'open-meteo') {
-				clayConfig.getItemByMessageKey('WEATHER_API_KEY').hide();
-			} else {
-				clayConfig.getItemByMessageKey('WEATHER_API_KEY').show();
-			}
-
 			if (weatherProviderInput.get() === 'none') {
 				weatherEnabledToggle.set(false);
 				weatherElements.forEach(function (element) {
@@ -183,6 +177,12 @@ module.exports = function(minified) {
 					$opacity: 0.25
 				});
 			} else {
+				if (weatherProviderInput.get() === 'open-meteo') {
+					clayConfig.getItemByMessageKey('WEATHER_API_KEY').hide();
+				} else {
+					clayConfig.getItemByMessageKey('WEATHER_API_KEY').show();
+				}
+
 				weatherEnabledToggle.set(true);
 				weatherElements.forEach(function (element) {
 					element.enable();

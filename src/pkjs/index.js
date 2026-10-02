@@ -218,16 +218,17 @@ function getWeather() {
 Pebble.addEventListener('webviewclosed', function(e) {
 	const claySettings = clay.getSettings(e.response, false);
 
-	const tempProviderChanged = (weatherProvider !== claySettings['WEATHER_PROVIDER'].value);
+	const weatherProviderChanged = (weatherProvider !== claySettings['WEATHER_PROVIDER'].value);
 	const tempUnitsChanged = (tempUnits !== claySettings['TEMP_UNIT'].value);
-	const forceTempUpdate = claySettings['REQUEST_WEATHER'].value;
+	const tempFeelsLikeChanged = (tempFeelsLike !== claySettings['TEMP_FEELS_LIKE'].value);
+	const forceWeatherUpdate = claySettings['REQUEST_WEATHER'].value;
 
 	tempUnits = claySettings['TEMP_UNIT'].value;
 	tempFeelsLike = claySettings['TEMP_FEELS_LIKE'].value;
 	weatherProvider = claySettings['WEATHER_PROVIDER'].value;
 	weatherAPIKey = claySettings['WEATHER_API_KEY'].value;
 
-	if (tempProviderChanged || tempUnitsChanged || forceTempUpdate) {
+	if (weatherProviderChanged || tempUnitsChanged || tempFeelsLikeChanged || forceWeatherUpdate) {
 		getWeather();
 	}
 });
