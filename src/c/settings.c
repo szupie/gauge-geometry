@@ -61,7 +61,8 @@ static void load_default_settings() {
 	settings.HandsShape = '0';
 	settings.TicksSize = 2;
 	settings.BatteryGaugeEnabled = true;
-	settings.TempEnabled = false;
+	settings.TempEnabled = true;
+	settings.TempUnit = 'c';
 }
 
 static uint32_t get_setting_key(enum SettingName setting) {

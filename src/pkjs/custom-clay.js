@@ -68,7 +68,7 @@ module.exports = function(minified) {
 
 		// Weather request can only be triggered on save, 
 		// so make button toggle hidden setting that gets reset every time
-		const forceWeatherToggle = clayConfig.getItemByMessageKey('UPDATE_WEATHER_ON_CONFIG');
+		const forceWeatherToggle = clayConfig.getItemByMessageKey('REQUEST_WEATHER');
 		const fetchWeatherButton = clayConfig.getItemById('fetchWeather');
 
 		forceWeatherToggle.hide();
@@ -167,19 +167,33 @@ module.exports = function(minified) {
 		const weatherElements = clayConfig.getItemsByGroup('weatherDetails');
 
 		function updateWeatherElements() {
-			if (weatherProviderInput.get() === "none") {
+
+			if (weatherProviderInput.get() === 'open-meteo') {
+				clayConfig.getItemByMessageKey('WEATHER_API_KEY').hide();
+			} else {
+				clayConfig.getItemByMessageKey('WEATHER_API_KEY').show();
+			}
+
+			if (weatherProviderInput.get() === 'none') {
 				weatherEnabledToggle.set(false);
 				weatherElements.forEach(function (element) {
 					element.disable();
+				});
+				$('.description', weatherProviderInput.$element).set({
+					$opacity: 0.25
 				});
 			} else {
 				weatherEnabledToggle.set(true);
 				weatherElements.forEach(function (element) {
 					element.enable();
 				});
+				$('.description', weatherProviderInput.$element).set({
+					$opacity: 1
+				});
 			}
+
 		}
-		
+	
 		weatherProviderInput.on('change', function() {
 			updateWeatherElements();
 		});

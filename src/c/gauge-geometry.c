@@ -66,15 +66,7 @@ static void handle_minute_tick(struct tm *tick_time, TimeUnits units_changed) {
 
 	// Get weather update every 30 minutes
 	if(tick_time->tm_min % 30 == 0) {
-		// Begin dictionary
-		DictionaryIterator *iter;
-		app_message_outbox_begin(&iter);
-
-		// Add a key-value pair
-		dict_write_uint8(iter, 0, 0);
-
-		// Send the message!
-		app_message_outbox_send();
+		request_weather();
 	}
 }
 
@@ -110,6 +102,23 @@ static void refresh_date_time() {
 	display_time(tick_time);
 	display_date(tick_time);
 }
+
+
+static void message_handler(DictionaryIterator *iterator, void *context) {
+	if (dict_find(iterator, MESSAGE_KEY_BG_COLOUR)) {
+		APP_LOG(APP_LOG_LEVEL_DEBUG, "Settings update received on Pebble");
+		handle_settings_received(iterator, context);
+
+	} else if (dict_find(iterator, MESSAGE_KEY_TEMP_NOW)) {
+		APP_LOG(APP_LOG_LEVEL_DEBUG, "Weather update received on Pebble");
+		handle_weather_update(iterator, context);
+
+	} else if (dict_find(iterator, MESSAGE_KEY_JS_READY)) {
+		APP_LOG(APP_LOG_LEVEL_DEBUG, "Watchface initiated, updating weather if stale");
+		request_weather();
+	}
+}
+
 
 #ifdef DEBUGGING_TIME
 static time_t debug_now;
@@ -191,8 +200,7 @@ static void init() {
 	});
 	window_stack_push(main_window, true);
 
-	events_app_message_register_inbox_received(handle_weather_update, NULL);
-	events_app_message_register_inbox_received(handle_settings_received, NULL);
+	events_app_message_register_inbox_received(message_handler, NULL);
 	const int inbox_size = 256;
 	const int outbox_size = 256;
 	events_app_message_request_inbox_size(inbox_size);

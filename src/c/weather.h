@@ -8,4 +8,5 @@ void check_temp_unit_change(char new_temp_unit);
 void update_temp_range(int min, int max);
 void update_temp_now(int now);
 void enable_temp(bool enabled);
+void request_weather();
 void handle_weather_update(DictionaryIterator *iterator, void *context);

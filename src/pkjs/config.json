@@ -167,37 +167,41 @@
 			{
 				"type": "select",
 				"messageKey": "WEATHER_PROVIDER",
-				"defaultValue": "none",
+				"defaultValue": "open-meteo",
 				"label": "Weather provider",
 				"options": [
-					{ 
-						"label": "None",
-						"value": "none"
+					{
+						"label": "Open-Meteo",
+						"value": "open-meteo"
 					},
-					{ 
+					{
 						"label": "OpenWeather",
 						"value": "owm"
 					},
-					{ 
+					{
 						"label": "Tomorrow.io",
 						"value": "tomorrow"
 					},
-					{ 
+					{
 						"label": "Weatherbit",
 						"value": "weatherbit"
+					},
+					{
+						"label": "Disable",
+						"value": "none"
 					}
-				]
+				],
+				"description": "Weather API requests are made every 30 minutes on the hour and half hour (8:00, 8:30, 9:00, etc.)"
 			},
 			{
 				"type": "input",
 				"messageKey": "WEATHER_API_KEY",
 				"label": "API key",
-				"group": "weatherDetails",
-				"description": "Weather API requests are made every 30 minutes on the hour and half hour (8:00, 8:30, 9:00, etc.)"
+				"group": "weatherDetails"
 			},
 			{
 				"type": "toggle",
-				"messageKey": "UPDATE_WEATHER_ON_CONFIG",
+				"messageKey": "REQUEST_WEATHER",
 				"label": "Trigger weather request on save",
 				"defaultValue": false,
 				"group": "weatherDetails"

@@ -2,13 +2,14 @@
 #include "settings.h"
 #include "graphics.h"
 
-#define EXPIRE_TIME 60*60*24*2 // 2 days
+#define EXPIRE_TIME 60*60*24*2 // 2 days before temperature range is stale
+#define POLL_RATE 60*15 // 15 minutes before current temperature is stale
 
 // these are keys for persistent storage
 uint32_t PERSIST_KEY_TEMP_NOW = 1;
 uint32_t PERSIST_KEY_TEMP_MIN = 2;
 uint32_t PERSIST_KEY_TEMP_MAX = 3;
-uint32_t PERSIST_KEY_TEMP_EXPIRE = 4;
+uint32_t PERSIST_KEY_TEMP_TIME = 4;
 
 static int temp_min, temp_max, temp_now;
 static bool temp_range_defined = false;
@@ -130,7 +131,7 @@ static void clear_weather_cache() {
 	persist_delete(PERSIST_KEY_TEMP_NOW);
 	persist_delete(PERSIST_KEY_TEMP_MIN);
 	persist_delete(PERSIST_KEY_TEMP_MAX);
-	persist_delete(PERSIST_KEY_TEMP_EXPIRE);
+	persist_delete(PERSIST_KEY_TEMP_TIME);
 	temp_range_defined = false;
 	temp_now_defined = false;
 }
@@ -143,8 +144,8 @@ void init_weather(Layer *range_layer, Layer *now_layer) {
 
 	temp_unit = settings.TempUnit;
 
-	if (persist_exists(PERSIST_KEY_TEMP_EXPIRE)) {
-		if (persist_read_int(PERSIST_KEY_TEMP_EXPIRE) > time(NULL)) {
+	if (persist_exists(PERSIST_KEY_TEMP_TIME)) {
+		if (persist_read_int(PERSIST_KEY_TEMP_TIME)+EXPIRE_TIME > time(NULL)) {
 
 			if (persist_exists(PERSIST_KEY_TEMP_MIN) && persist_exists(PERSIST_KEY_TEMP_MAX)) {
 				update_temp_range(
@@ -211,6 +212,16 @@ void enable_temp(bool enabled) {
 	}
 }
 
+void request_weather() {
+	if (!persist_exists(PERSIST_KEY_TEMP_TIME) || persist_read_int(PERSIST_KEY_TEMP_TIME)+POLL_RATE < time(NULL)) {
+		APP_LOG(APP_LOG_LEVEL_DEBUG, "Sending weather request to phone");
+		DictionaryIterator *iter;
+		app_message_outbox_begin(&iter);
+		dict_write_uint8(iter, MESSAGE_KEY_REQUEST_WEATHER, 1);
+		app_message_outbox_send();
+	}
+}
+
 void handle_weather_update(DictionaryIterator *iterator, void *context) {
 	// Read tuples for data
 	Tuple *temp_now_tuple = dict_find(iterator, MESSAGE_KEY_TEMP_NOW);
@@ -231,6 +242,6 @@ void handle_weather_update(DictionaryIterator *iterator, void *context) {
 		update_temp_now((int)temp_now_tuple->value->int32);
 		persist_write_int(PERSIST_KEY_TEMP_NOW, temp_now);
 
-		persist_write_int(PERSIST_KEY_TEMP_EXPIRE, time(NULL)+EXPIRE_TIME);
+		persist_write_int(PERSIST_KEY_TEMP_TIME, time(NULL));
 	}
 }

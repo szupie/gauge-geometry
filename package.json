@@ -44,12 +44,13 @@
 			"TEMP_FEELS_LIKE",
 			"WEATHER_PROVIDER",
 			"WEATHER_API_KEY",
-			"UPDATE_WEATHER_ON_CONFIG",
 			"TEMP_NOW_COLOUR",
 			"TEMP_RANGE_COLOUR",
 			"TEMP_NOW",
 			"TEMP_MIN",
-			"TEMP_MAX"
+			"TEMP_MAX",
+			"REQUEST_WEATHER",
+			"JS_READY"
 		],
 		"resources": {
 			"media": [
