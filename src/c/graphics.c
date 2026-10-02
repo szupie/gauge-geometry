@@ -27,30 +27,38 @@ static void init_text_style(TextLayer *layer) {
 static void update_date_group_position(unsigned short hour) {
 	GRect frame = layer_get_frame(date_group_layer);
 
-	#if defined(PBL_ROUND)
-	GRect bounds = layer_get_bounds(window_layer);
-	int center = bounds.size.w / 2;
-	#if PBL_DISPLAY_WIDTH > 180
 	int left = 15;
-	#else
-	int left = center/2 - frame.size.w/2;
+	#if defined(PBL_ROUND)
+
+		#if PBL_DISPLAY_WIDTH < 260
+			GRect bounds = layer_get_bounds(window_layer);
+			int center = bounds.size.w / 2;
+			left = center/2 - frame.size.w/2;
+		#endif
+
+		if (hour >= 20) {
+			frame.origin.x = left - 10;
+		} else if (hour >= 10) {
+			frame.origin.x = left - 8;
+		} else {
+			frame.origin.x = left;
+		}
 	#endif
 
-	if (hour >= 20) {
-		frame.origin.x = left - 10;
-	} else if (hour >= 10) {
-		frame.origin.x = left - 8;
-	} else {
-		frame.origin.x = left;
-	}
-	#elif PBL_DISPLAY_WIDTH < 180
-	if (hour >= 10) {
-		frame.origin.x = 8;
-	} else {
-		frame.origin.x = 15;
-	}
-	#elif PBL_DISPLAY_WIDTH > 190
-	frame.origin.x = 15;
+	#if defined(PBL_RECT)
+		#if PBL_DISPLAY_WIDTH > 180
+			if (hour >= 20) {
+				frame.origin.x = left - 3;
+			} else {
+				frame.origin.x = left;
+			}
+		#else
+			if (hour >= 10) {
+				frame.origin.x = left - 7;
+			} else {
+				frame.origin.x = left;
+			}
+		#endif
 	#endif
 
 	layer_set_frame(date_group_layer, frame);
