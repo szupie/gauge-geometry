@@ -212,13 +212,19 @@ void enable_temp(bool enabled) {
 	}
 }
 
-void request_weather() {
-	if (!persist_exists(PERSIST_KEY_TEMP_TIME) || persist_read_int(PERSIST_KEY_TEMP_TIME)+POLL_RATE < time(NULL)) {
-		APP_LOG(APP_LOG_LEVEL_DEBUG, "Sending weather request to phone");
-		DictionaryIterator *iter;
-		app_message_outbox_begin(&iter);
-		dict_write_uint8(iter, MESSAGE_KEY_REQUEST_WEATHER, 1);
-		app_message_outbox_send();
+void request_weather_if_needed() {
+	// If temperature is enabled and last data time is older than POLL_RATE
+	if (settings.TempEnabled) {
+		if (
+			!persist_exists(PERSIST_KEY_TEMP_TIME) || 
+			persist_read_int(PERSIST_KEY_TEMP_TIME)+POLL_RATE < time(NULL)
+		) {
+			APP_LOG(APP_LOG_LEVEL_DEBUG, "Sending weather request to phone");
+			DictionaryIterator *iter;
+			app_message_outbox_begin(&iter);
+			dict_write_uint8(iter, MESSAGE_KEY_REQUEST_WEATHER, 1);
+			app_message_outbox_send();
+		}
 	}
 }
 

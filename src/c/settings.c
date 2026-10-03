@@ -193,7 +193,6 @@ void handle_settings_received(DictionaryIterator *iterator, void *context) {
 
 	save_settings();
 
-	enable_temp(settings.TempEnabled);
 	check_temp_unit_change(settings.TempUnit);
 
 	update_style();

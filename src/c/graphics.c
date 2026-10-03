@@ -169,6 +169,7 @@ void update_style() {
 		settings.TicksSize,
 		settings.BatteryGaugeEnabled
 	);
+	enable_temp(settings.TempEnabled);
 	set_temp_range_colour(settings.TempRangeColour);
 	set_temp_now_colour(settings.TempNowColour);
 	

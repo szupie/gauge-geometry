@@ -228,8 +228,11 @@ Pebble.addEventListener('webviewclosed', function(e) {
 	weatherProvider = claySettings['WEATHER_PROVIDER'].value;
 	weatherAPIKey = claySettings['WEATHER_API_KEY'].value;
 
-	if (weatherProviderChanged || tempUnitsChanged || tempFeelsLikeChanged || forceWeatherUpdate) {
-		getWeather();
+	// if temperature is enabled and settings change necessitates update
+	if (claySettings['TEMP_ENABLED'].value) {
+		if (weatherProviderChanged || tempUnitsChanged || tempFeelsLikeChanged || forceWeatherUpdate) {
+			getWeather();
+		}
 	}
 });
 

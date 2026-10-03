@@ -66,7 +66,7 @@ static void handle_minute_tick(struct tm *tick_time, TimeUnits units_changed) {
 
 	// Get weather update every 30 minutes
 	if(tick_time->tm_min % 30 == 0) {
-		request_weather();
+		request_weather_if_needed();
 	}
 }
 
@@ -114,8 +114,8 @@ static void message_handler(DictionaryIterator *iterator, void *context) {
 		handle_weather_update(iterator, context);
 
 	} else if (dict_find(iterator, MESSAGE_KEY_JS_READY)) {
-		APP_LOG(APP_LOG_LEVEL_DEBUG, "Watchface initiated, updating weather if stale");
-		request_weather();
+		APP_LOG(APP_LOG_LEVEL_DEBUG, "Watchface initiated, checking if weather update is needed");
+		request_weather_if_needed();
 	}
 }
 
