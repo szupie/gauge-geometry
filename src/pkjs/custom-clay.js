@@ -457,7 +457,7 @@ module.exports = function(minified) {
 		},
 		blackgold: {
 			'BG_COLOUR': '000000',
-			'TIME_COLOUR': 'AAAA00',
+			'TIME_COLOUR': '000000',
 			'DATE_COLOUR': 'AAAA00',
 			'HOUR_HAND_COLOUR': 'FFFF55',
 			'MINUTE_HAND_COLOUR': 'FFFF55',
@@ -465,7 +465,7 @@ module.exports = function(minified) {
 			'TICKS_COLOUR': 'AAAA00',
 			'TICKS_SIZE': '1',
 			'TEMP_NOW_COLOUR': 'FFFF00',
-			'TEMP_RANGE_COLOUR': 'AAAAAA'
+			'TEMP_RANGE_COLOUR': '555555'
 		},
 		bw_classic: {
 			'BG_COLOUR': 'FFFFFF',

@@ -38,7 +38,7 @@ static void load_default_settings() {
 	settings.DateColour = GColorOxfordBlue;
 
 	settings.HourHandColour = GColorDarkCandyAppleRed;
-	settings.MinuteHandColour = GColorCobaltBlue;
+	settings.MinuteHandColour = GColorBlueMoon;
 
 	settings.TicksColour = GColorOxfordBlue;
 
