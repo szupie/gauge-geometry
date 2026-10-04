@@ -9,10 +9,26 @@ Large digits and analog hands make it easy to read the time at a glance from mor
 Get it from the [Rebble appstore](https://apps.rebble.io/en_US/application/5fd419293dd3100155d398b8). Or download the latest `.pbw` binary from the [releases page](https://github.com/szupie/gauge-geometry/releases) on GitHub and sideload it to your device.
 
 ## Building
-To build this project, you’ll need the Pebble SDK installed ([setup guide](https://github.com/andb3/pebble-setup)). Then run `pebble build`, and 
-`pebble install --emulator [basalt, chalk]` or `pebble install --phone phone_ip` to run on the emulator or a Pebble.
+To build this project, you’ll need the Pebble SDK installed ([setup guide](https://developer.repebble.com/sdk/)). Then run `pebble build`, and 
+`pebble install --emulator [gabbro/chalk/emery/etc]` or `pebble install --phone phone_ip` to run on the emulator or a Pebble.
+
+## Source Structure
+- c
+  - `gauge-geometry`: logic and events
+  - `settings`: watchface settings data storage
+  - `graphics`: rendering order and styles
+  - `big-digits`: hour/minute digits
+  - `hands` and `hand_shapes`: watch hands 
+  - `weather`: weather gauges, weather data storage 
+  - `ticks`: ticks and charging animation
+- pkjs
+  - `index.js`: weather APIs
+  - `config.json`: configuration screen markup
+  - `custom-clay.js`: configuration screen styles and functionality
+  - `screenshots-*.json`: configuration screen theme screenshots
 
 ## Credits
-This project uses [Clay](https://github.com/pebble/clay), [GBitmap Colour Palette Manipulator](https://github.com/rebootsramblings/GBitmap-Colour-Palette-Manipulator), and [pebble-events](https://github.com/Katharine/pebble-events).
+This project uses [Clay](https://github.com/pebble-dev/clay), [GBitmap Colour Palette Manipulator](https://github.com/rebootsramblings/GBitmap-Colour-Palette-Manipulator), and [pebble-events](https://github.com/Katharine/pebble-events).
 
 Digital time is set in Century Gothic. Day/date text is set in [Poppins](https://github.com/itfoundry/poppins).
+
