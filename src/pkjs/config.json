@@ -6,7 +6,6 @@
 	},
 	{
 		"type": "section",
-		"capabilities": ["COLOR"],
 		"items": [
 			{
 				"type": "heading",
@@ -15,24 +14,14 @@
 				"size": 4
 			},
 			{
+				"capabilities": ["COLOR"],
 				"type": "text",
 				"defaultValue": "<section id='presetThemes'><button data-theme-id='classic'>Classic</button><button data-theme-id='nautical'>Nautical</button><button data-theme-id='gold'>Gold</button><button data-theme-id='rose'>Rose</button><button data-theme-id='purple'>Purple</button><button data-theme-id='salmon'>Artic Salmon</button><button data-theme-id='red'>Red</button><button data-theme-id='blackgold'>Black Gold</button></section>"
-			}
-		]
-	},
-	{
-		"type": "section",
-		"capabilities": ["BW"],
-		"items": [
-			{
-				"type": "heading",
-				"id": "themes-accordion",
-				"defaultValue": "<span class='accordion-label'>Preset themes</span>",
-				"size": 4
 			},
 			{
+				"capabilities": ["BW"],
 				"type": "text",
-				"defaultValue": "<section id='presetThemes' class='rect'><button data-theme-id='bw_classic'>Classic</button><button data-theme-id='bw_pointer'>Pointer</button><button data-theme-id='bw_bubbles'>Bubbles</button><button data-theme-id='bw_newsprint'>Newsprint</button><button data-theme-id='bw_woodcut'>Woodcut</button></section>"
+				"defaultValue": "<section id='presetThemes' class='bw'><button data-theme-id='bw_classic'>Classic</button><button data-theme-id='bw_pointer'>Pointer</button><button data-theme-id='bw_bubbles'>Bubbles</button><button data-theme-id='bw_newsprint'>Newsprint</button><button data-theme-id='bw_woodcut'>Woodcut</button></section>"
 			}
 		]
 	},

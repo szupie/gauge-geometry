@@ -28,7 +28,8 @@
 			"watchface": true
 		},
 		"capabilities": [
-			"location"
+			"location",
+			"configurable"
 		],
 		"messageKeys": [
 			"BG_COLOUR",

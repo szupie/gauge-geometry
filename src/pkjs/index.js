@@ -1,7 +1,36 @@
 const Clay = require('@rebble/clay');
 const clayConfig = require('./config.json');
 const customClay = require('./custom-clay');
-const clay = new Clay(clayConfig, customClay);
+const platform = Pebble.getActiveWatchInfo().platform;
+let displayShape, screenshots;
+switch (platform) {
+	default:
+	case 'gabbro':
+		displayShape = 'round';
+		screenshots = require('./screenshots-round-260.json');
+		break;
+	case 'chalk':
+		displayShape = 'round';
+		screenshots = require('./screenshots-round-180.json');
+		break;
+	case 'emery':
+		displayShape = 'rect';
+		screenshots = require('./screenshots-rect-200.json');
+		break;
+	case 'basalt':
+		displayShape = 'rect';
+		screenshots = require('./screenshots-rect-144.json');
+		break;
+	case 'flint':
+	case 'diorite':
+	case 'aplite':
+		displayShape = 'rect';
+		screenshots = require('./screenshots-bw.json');
+		break;
+}
+const clay = new Clay(clayConfig, customClay, {
+	userData: {displayShape, screenshots}
+});
 
 var tempUnits;
 var tempFeelsLike;
