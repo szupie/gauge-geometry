@@ -6,7 +6,7 @@ An analog-digital Pebble watch face designed for legibility and simplicity
 Large digits and analog hands make it easy to read the time at a glance from more angles. The watch face also displays day/date, temperature, and battery level. Colours and hand shapes are customisable from the settings page.
 
 ## Installation
-Get it from the [Rebble appstore](https://apps.rebble.io/en_US/application/5fd419293dd3100155d398b8). Or download the latest `.pbw` binary from the [releases page](https://github.com/szupie/gauge-geometry/releases) on GitHub and sideload it to your device.
+Get it from the [Pebble appstore](https://apps.repebble.com/5fd419293dd3100155d398b8). Or download the latest `.pbw` binary from the [releases page](https://github.com/szupie/gauge-geometry/releases) on GitHub and sideload it to your device.
 
 ## Building
 To build this project, you’ll need the Pebble SDK installed ([setup guide](https://developer.repebble.com/sdk/)). Then run `pebble build`, and 
